@@ -1,0 +1,87 @@
+# Simple Flink cluster for educational purposes
+# Prioritizes learning clarity over production complexity
+services:
+  # Flink JobManager - handles job coordination and Web UI
+  jobmanager:
+    image: flink:2.0.0-scala_2.12-java17
+    hostname: jobmanager
+    ports:
+      - "8081:8081"  # Flink Web UI - access at http://localhost:8081
+      - "6123:6123"  # JobManager RPC port
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.address: jobmanager
+        rest.port: 8081
+        rest.flamegraph.enabled: true
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 1
+        execution.checkpointing.interval: 60s
+        state.backend: hashmap
+        taskmanager.memory.process.size: 2g
+        jobmanager.memory.process.size: 1536m
+      - |
+        JVM_ARGS=
+        --add-opens=java.base/java.util=ALL-UNNAMED
+        --add-opens=java.base/java.lang=ALL-UNNAMED
+        --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+        --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+        --add-opens=java.base/java.io=ALL-UNNAMED
+        --add-opens=java.base/java.net=ALL-UNNAMED
+        --add-opens=java.base/java.nio=ALL-UNNAMED
+        --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+        --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+        --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED
+    volumes:
+      - ./config:/opt/flink/conf:ro
+      - ./build/libs:/opt/flink/usrlib
+      - ./data:/data
+      - ./checkpoints:/checkpoints
+    networks:
+      - flink-demo
+    command: jobmanager
+
+  # Flink TaskManager - executes the actual stream processing tasks
+  taskmanager:
+    image: flink:2.0.0-scala_2.12-java17
+    hostname: taskmanager
+    depends_on:
+      - jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        taskmanager.memory.process.size: 2g
+        taskmanager.memory.managed.fraction: 0.1
+        parallelism.default: 1
+      - |
+        JVM_ARGS=
+        --add-opens=java.base/java.util=ALL-UNNAMED
+        --add-opens=java.base/java.lang=ALL-UNNAMED
+        --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+        --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+        --add-opens=java.base/java.io=ALL-UNNAMED
+        --add-opens=java.base/java.net=ALL-UNNAMED
+        --add-opens=java.base/java.nio=ALL-UNNAMED
+        --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+        --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+        --add-opens=java.base/java.util.concurrent.locks=ALL-UNNAMED
+    volumes:
+      - ./config:/opt/flink/conf:ro
+      - ./build/libs:/opt/flink/usrlib
+      - ./data:/data
+      - ./checkpoints:/checkpoints
+    networks:
+      - flink-demo
+    command: taskmanager
+
+networks:
+  flink-demo:
+    driver: bridge
+
+volumes:
+  # Persistent storage for checkpoints and data
+  checkpoints:
+  data:

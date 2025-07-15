@@ -1,0 +1,125 @@
+package com.example.flink.lesson01;
+
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.util.Collector;
+
+/**
+ * Lesson 1: DataStream API with In-Memory Data
+ *
+ * This lesson demonstrates the fundamentals of Apache Flink's DataStream API using simple,
+ * in-memory data sources. Perfect for understanding core concepts without external dependencies.
+ *
+ * What you'll learn:
+ * - How to set up a StreamExecutionEnvironment
+ * - Creating data streams from in-memory collections
+ * - Applying basic transformations (flatMap, keyBy, sum)
+ * - Understanding parallelism and operator chaining
+ * - Observing stream processing in the Flink Web UI
+ *
+ * Expected Output:
+ * You should see incremental word counts printed to the console as each sentence is processed:
+ * (apache,1) -> (apache,2) -> (apache,3)
+ * (flink,1) -> (flink,2) -> (flink,3) -> (flink,4)
+ * (streaming,1) -> (streaming,2)
+ * (data,1)
+ * (processing,1)
+ *
+ * Try this:
+ * 1. Change the input data and observe different word counts
+ * 2. Modify the window size and see how it affects aggregation
+ * 3. Experiment with different parallelism settings
+ * 4. Add more transformation steps to the pipeline
+ */
+public class StreamingWordCount {
+
+  public static void main(String[] args) throws Exception {
+
+    // Step 1: Create the execution environment
+    // This is the main entry point for all Flink programs
+    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+
+    // Configure for educational clarity - single parallelism makes it easier to follow
+    env.setParallelism(1);
+
+    // Disable operator chaining so we can see individual operators in the Web UI
+    // In production, you'd typically leave this enabled for better performance
+    env.disableOperatorChaining();
+
+    System.out.println("=== Flink Lesson 1: Streaming Word Count ===");
+    System.out.println("Starting stream processing with in-memory data...");
+        
+    // Step 2: Create a data stream from in-memory data
+    // In real applications, this would typically come from Kafka, files, or other sources
+    DataStreamSource<String> textLines = env.fromData(
+        "apache flink streaming data processing",
+        "real time analytics with apache flink",
+        "flink datastream api tutorial",
+        "streaming word count example",
+        "apache flink lesson one"
+    );
+
+    // Step 3: Transform the data using the DataStream API
+    // This creates a processing pipeline that will:
+    // 1. Split each line into words (flatMap with Tokenizer)
+    // 2. Group by word (keyBy)
+    // 3. Count occurrences (sum) - aggregates across all data
+    DataStream<Tuple2<String, Integer>> wordCounts = textLines
+        .flatMap(new Tokenizer())                                    // Split lines into words
+        .keyBy(value -> value.f0)                                   // Group by word (first field)
+        .sum(1);                                                    // Sum the counts (second field)
+
+    // Step 4: Output the results
+    // In production, you might write to Kafka, databases, or files
+    wordCounts.print("Word Count Results");
+
+    // Step 5: Execute the program
+    // Nothing happens until you call execute() - this triggers the actual processing
+    env.execute("Lesson 1: Streaming Word Count with In-Memory Data");
+
+    System.out.println("Stream processing completed!");
+  }
+
+  /**
+   * Tokenizer: A simple function that splits text lines into individual words
+   *
+   * This implements FlatMapFunction, which means:
+   * - Input: One element (a line of text)
+   * - Output: Zero or more elements (individual words as Tuple2<word, count>)
+   *
+   * Try this:
+   * - Modify the regex pattern to handle different word separators
+   * - Add filtering for common stop words ("the", "and", "or", etc.)
+   * - Convert to lowercase for case-insensitive counting
+   * - Add minimum word length filtering
+   */
+  public static class Tokenizer implements FlatMapFunction<String, Tuple2<String, Integer>> {
+
+    @Override
+    public void flatMap(String line, Collector<Tuple2<String, Integer>> out) {
+
+      // Convert to lowercase for consistent counting
+      String cleanLine = line.toLowerCase().trim();
+
+      // Split the line into words using whitespace and punctuation as separators
+      // The regex \\W+ matches one or more non-word characters
+      String[] words = cleanLine.split("\\W+");
+
+      // Emit each word with an initial count of 1
+      for (String word : words) {
+        // Only emit non-empty words (filter out empty strings from splitting)
+        if (!word.isEmpty()) {
+          // Create a tuple: (word, 1)
+          // The "1" will be summed up later in the aggregation step
+          out.collect(new Tuple2<>(word, 1));
+
+          // Educational debugging: uncomment to see each word being processed
+          // System.out.println("Processing word: " + word);
+        }
+      }
+    }
+  }
+}

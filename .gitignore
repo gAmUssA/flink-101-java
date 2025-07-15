@@ -1,0 +1,133 @@
+# Apache Flink 2.0 Demo Suite - Git Ignore Configuration
+# Educational project - keep it simple and focused
+
+# Gradle build artifacts
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE configuration files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Java compilation artifacts
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Virtual machine crash logs
+hs_err_pid*
+replay_pid*
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Flink runtime artifacts
+checkpoints/
+savepoints/
+data/
+logs/
+*.log
+
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+kafka.properties
+confluent.properties
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Maven (if accidentally used)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Eclipse (if used)
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+.project
+.externalToolBuilders/
+*.launch
+.pydevproject
+.cproject
+.autotools
+.factorypath
+.buildpath
+.target
+.tern-project
+.texlipse
+.springBeans
+.recommenders/
+.apt_generated/
+.apt_generated_test/
+
+# NetBeans (if used)
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Educational focus - exclude complex tooling
+.sonar/
+.scannerwork/
+coverage/
+*.coverage
+.nyc_output/
+.coverage/
+htmlcov/
+
+# Keep educational examples and documentation
+!docs/
+!src/
+!config/
+!shared/
+!README.md
+!*.md

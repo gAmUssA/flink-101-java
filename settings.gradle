@@ -1,0 +1,4 @@
+// Apache Flink 2.0 Demo Suite - Gradle Settings
+// Educational project following Flink best practices
+
+rootProject.name = 'flink-demo-suite'
