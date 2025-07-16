@@ -1,7 +1,7 @@
 plugins {
     java
     application
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.8"
 }
 
 group = "com.example.flink"
@@ -71,9 +71,10 @@ dependencies {
     // --------------------------------------------------------------
     val flinkShadowJar by configurations
     flinkShadowJar("org.apache.flink:flink-connector-kafka:$kafkaConnectorVersion")
+    flinkShadowJar("org.apache.flink:flink-connector-base:$flinkVersion")
     flinkShadowJar("com.fasterxml.jackson.core:jackson-databind:2.15.2")
     
-    // Table API and SQL for lessons 4-5 (will be added later)
+    // Table API and SQL for lessons 4-5 (commented until Flink 2.0 is released)
     // implementation("org.apache.flink:flink-table-api-java-bridge:$flinkVersion")
     // implementation("org.apache.flink:flink-table-planner:$flinkVersion")
     

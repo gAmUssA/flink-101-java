@@ -6,10 +6,10 @@ import java.util.Random;
 
 /**
  * Sample Data Generator for Educational Flink Lessons
- *
+ * <p>
  * This utility provides various datasets for experimentation across different lessons.
  * Designed for educational clarity - simple, understandable data that demonstrates concepts clearly.
- *
+ * <p>
  * Usage Examples:
  * - Use different datasets to see how word counts change
  * - Experiment with varying data sizes and complexity

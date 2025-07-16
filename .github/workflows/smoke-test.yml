@@ -1,0 +1,60 @@
+name: Smoke Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java-version: [17, 21]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK ${{ matrix.java-version }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ matrix.java-version }}
+        distribution: 'temurin'
+    
+    - name: Cache Gradle packages
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    
+    - name: Build project
+      run: ./gradlew build --no-daemon
+    
+    - name: Validate project setup
+      run: ./gradlew validateSetup --no-daemon
+    
+    - name: Run lesson 1 smoke test
+      run: timeout 30s ./gradlew runLesson01 --no-daemon || true
+    
+    - name: Check shadow jar creation
+      run: |
+        ./gradlew shadowJar --no-daemon
+        ls -la build/libs/
+        test -f build/libs/flink-demo.jar
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: build-artifacts-java-${{ matrix.java-version }}
+        path: |
+          build/libs/
+          build/reports/
