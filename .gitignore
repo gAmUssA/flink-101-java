@@ -1,12 +1,6 @@
 # Apache Flink 2.0 Demo Suite - Git Ignore Configuration
 # Educational project - keep it simple and focused
 
-# Gradle build artifacts
-.gradle/
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 # IDE configuration files
 .idea/
@@ -131,3 +125,10 @@ htmlcov/
 !shared/
 !README.md
 !*.md
+
+# Gradle build artifacts
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
