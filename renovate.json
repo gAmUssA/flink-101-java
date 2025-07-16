@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "timezone": "America/New_York",
+  "labels": [
+    "dependencies"
+  ],
+  "assigneesFromCodeOwners": true,
+  "reviewersFromCodeOwners": true,
+  "packageRules": [
+    {
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["org.apache.flink:**"],
+      "groupName": "Apache Flink",
+      "schedule": [
+        "before 6am on monday"
+      ]
+    },
+    {
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["org.apache.logging.log4j:**"],
+      "groupName": "Apache Log4j",
+      "schedule": [
+        "before 6am on monday"
+      ]
+    },
+    {
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["com.fasterxml.jackson.core:**"],
+      "groupName": "Jackson",
+      "schedule": [
+        "before 6am on monday"
+      ]
+    },
+    {
+      "matchManagers": ["gradle"],
+      "matchPackageNames": ["com.gradleup.shadow"],
+      "groupName": "Gradle Shadow Plugin"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "GitHub Actions",
+      "automerge": true,
+      "automergeType": "pr"
+    }
+  ],
+  "gradle": {
+    "timeout": 300
+  },
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 10,
+  "branchConcurrentLimit": 20,
+  "semanticCommits": "enabled",
+  "semanticCommitType": "chore",
+  "semanticCommitScope": "deps"
+}
