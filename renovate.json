@@ -50,7 +50,16 @@
     }
   ],
   "gradle": {
-    "timeout": 300
+    "timeout": 300,
+    "ignoreDeps": [
+      "clean",
+      "build",
+      "runLesson01",
+      "runLesson02", 
+      "runLesson03",
+      "runLesson04",
+      "runLesson05"
+    ]
   },
   "prHourlyLimit": 2,
   "prConcurrentLimit": 10,
