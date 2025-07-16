@@ -31,6 +31,11 @@ sourceSets {
     }
 }
 
+// Configure duplicate handling strategy for processResources
+tasks.processResources {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 repositories {
     mavenCentral()
     maven {
@@ -108,7 +113,8 @@ tasks.named<JavaExec>("run") {
 tasks.compileJava {
     options.compilerArgs.addAll(listOf(
         "-parameters",
-        "-Xlint:unchecked"
+        "-Xlint:unchecked",
+        "-Xlint:deprecation"
     ))
 }
 
@@ -127,11 +133,34 @@ tasks.register<JavaExec>("runLesson02") {
     mainClass.set("com.example.flink.lesson02.KafkaConsumerExample")
 }
 
-tasks.register<JavaExec>("runLesson03") {
-    group = "lessons"
-    description = "Run Lesson 3: Advanced Stream Processing"
+
+// Lesson 3 Separate Jobs - Individual use cases for focused learning
+tasks.register<JavaExec>("runLesson03A") {
+    group = "lesson03"
+    description = "Run Lesson 3A: Customer Order Tracking - Basic customer totals and order counts"
     classpath = sourceSets.main.get().runtimeClasspath
-    mainClass.set("com.example.flink.lesson03.OrderProcessingJob")
+    mainClass.set("com.example.flink.lesson03.CustomerOrderTrackingJob")
+}
+
+tasks.register<JavaExec>("runLesson03B") {
+    group = "lesson03"
+    description = "Run Lesson 3B: VIP Customer Detection - Customer classification based on spending"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.example.flink.lesson03.VIPCustomerDetectionJob")
+}
+
+tasks.register<JavaExec>("runLesson03C") {
+    group = "lesson03"
+    description = "Run Lesson 3C: Order Frequency Analysis - Customer behavioral tracking"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.example.flink.lesson03.OrderFrequencyAnalysisJob")
+}
+
+tasks.register<JavaExec>("runLesson03D") {
+    group = "lesson03"
+    description = "Run Lesson 3D: Category Spending Analysis - Product category analytics"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.example.flink.lesson03.CategorySpendingAnalysisJob")
 }
 
 tasks.register<JavaExec>("runLesson04") {
