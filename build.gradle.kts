@@ -148,6 +148,13 @@ tasks.register<JavaExec>("runLesson05") {
     mainClass.set("com.example.flink.lesson05.TableAPIExample")
 }
 
+tasks.register<JavaExec>("runKafkaProducer") {
+    group = "kafka"
+    description = "Run Kafka Order Producer - generates continuous Order data for testing"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("shared.data.generators.KafkaOrderProducer")
+}
+
 // Shadow JAR configuration following Flink best practices
 tasks.shadowJar {
     archiveBaseName.set("flink-demo")
