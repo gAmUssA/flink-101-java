@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Order Schema",
+  "description": "Schema for order data structure",
+  "properties": {
+    "orderId": {
+      "type": "string",
+      "description": "Unique identifier for the order",
+      "pattern": "^order_[0-9]+$",
+      "example": "order_00253"
+    },
+    "customerId": {
+      "type": "string",
+      "description": "Unique identifier for the customer",
+      "pattern": "^customer_[0-9]+$",
+      "example": "customer_005"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Order amount in currency units",
+      "minimum": 0,
+      "example": 63.559299181589616
+    },
+    "timestamp": {
+      "type": "integer",
+      "description": "Unix timestamp in milliseconds",
+      "minimum": 0,
+      "example": 1752682829767
+    },
+    "category": {
+      "type": "string",
+      "description": "Product category for the order",
+      "enum": ["Electronics", "Clothing", "Books", "Home", "Sports", "Beauty", "Automotive"],
+      "example": "Electronics"
+    }
+  },
+  "required": ["orderId", "customerId", "amount", "timestamp", "category"],
+  "additionalProperties": false
+}
