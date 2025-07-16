@@ -108,7 +108,7 @@ public class KafkaUtils {
                 "username=\"%s\" password=\"%s\";", apiKey, apiSecret));
 
         // Consumer behavior settings for educational clarity
-        props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
+        props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
         props.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
 
