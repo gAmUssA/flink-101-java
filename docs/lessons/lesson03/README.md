@@ -2,7 +2,17 @@
 
 ## Overview
 
-This lesson demonstrates advanced Apache Flink stream processing concepts including stateful processing, keyed streams, and complex transformations using real-time data from Confluent Cloud Kafka. You'll learn how to build applications that maintain state across multiple events and implement sophisticated business logic for real-time analytics.
+This lesson demonstrates advanced Apache Flink stream processing concepts through **four separate, focused jobs** that each teach specific aspects of stateful processing, keyed streams, and complex transformations using real-time data from Confluent Cloud Kafka. Each job focuses on a single use case for better educational clarity and easier experimentation.
+
+### The Four Jobs
+
+**Lesson 3A: Customer Order Tracking** - Learn basic stateful processing by tracking customer order totals and counts using KeyedProcessFunction with managed state.
+
+**Lesson 3B: VIP Customer Detection** - Explore customer classification using RichMapFunction to categorize customers into tiers (REGULAR, VIP, PREMIUM) based on spending patterns.
+
+**Lesson 3C: Order Frequency Analysis** - Understand behavioral analysis by tracking customer ordering frequency and classifying behavior patterns (NEW, OCCASIONAL, REGULAR, FREQUENT).
+
+**Lesson 3D: Category Spending Analysis** - Master complex state management by analyzing spending patterns across product categories with multiple metrics (total, count, average, max).
 
 ## Learning Objectives
 
@@ -119,52 +129,101 @@ Sent Order> Order{id=order_00001, customer=customer_002, amount=156.78, category
 Sent Order> Order{id=order_00002, customer=customer_001, amount=89.99, category=Books}
 ```
 
-### Step 3: Run the Advanced Processing Job
-```bash
-# Using Gradle task
-./gradlew runLesson03
+### Step 3: Choose and Run a Specific Job
 
-# Or compile and run directly
-./gradlew build
-java -cp build/libs/flink-demo.jar com.example.flink.lesson03.OrderProcessingJob
+Each job focuses on a different aspect of stream processing. You can run them individually or multiple jobs simultaneously in separate terminals:
+
+#### Option A: Customer Order Tracking (Lesson 3A)
+```bash
+# Basic stateful processing - customer totals and counts
+./gradlew runLesson03A
+```
+
+#### Option B: VIP Customer Detection (Lesson 3B)
+```bash
+# Customer classification based on spending patterns
+./gradlew runLesson03B
+```
+
+#### Option C: Order Frequency Analysis (Lesson 3C)
+```bash
+# Behavioral analysis - ordering frequency patterns
+./gradlew runLesson03C
+```
+
+#### Option D: Category Spending Analysis (Lesson 3D)
+```bash
+# Category-based analytics with multiple metrics
+./gradlew runLesson03D
+```
+
+#### Running Multiple Jobs Simultaneously
+```bash
+# Terminal 1: Start customer tracking
+source .env && ./gradlew runLesson03A
+
+# Terminal 2: Start VIP detection
+source .env && ./gradlew runLesson03B
+
+# Terminal 3: Start frequency analysis
+source .env && ./gradlew runLesson03C
+
+# Terminal 4: Start category analysis
+source .env && ./gradlew runLesson03D
 ```
 
 ### Step 4: Observe Real-time Processing
-Watch the console output for real-time analytics as orders are processed.
+Watch the console output for real-time analytics specific to each job's focus area.
 
 ## Expected Output
 
-When running successfully with the KafkaOrderProducer, you should see:
-
+### Lesson 3A: Customer Order Tracking
 ```
-=== Flink Lesson 3: Advanced Stream Processing ===
-Processing order stream with stateful operations...
-Connecting to Confluent Cloud Kafka for order data...
-✓ Loaded CNFL_KAFKA_BROKER from environment
-✓ Loaded CNFL_KC_API_KEY from environment
-✓ Loaded CNFL_KC_API_SECRET from environment
-Bootstrap servers: pkc-rgm37.us-west-2.aws.confluent.cloud:9092
-Using topic: orders
-Using consumer group: flink-lesson03-order-processing
-✓ Kafka consumer properties configured for Confluent Cloud
-Starting advanced stream processing... Press Ctrl+C to stop.
+=== Flink Lesson 3A: Customer Order Tracking ===
+Tracking customer order totals and counts with stateful processing
 
 Updated customer customer_002: total=156.78, orders=1
 Customer Totals> (customer_002,156.78,1)
-VIP Status> customer_002: REGULAR (total: 156.78, orders: 1)
-Order Frequency> customer_002: 1 orders in session (NEW CUSTOMER)
-Category Analysis> Category Electronics: total=156.78, orders=1, avg=156.78, max=156.78
-
 Updated customer customer_001: total=89.99, orders=1
 Customer Totals> (customer_001,89.99,1)
-VIP Status> customer_001: REGULAR (total: 89.99, orders: 1)
-Order Frequency> customer_001: 1 orders in session (NEW CUSTOMER)
-Category Analysis> Category Books: total=89.99, orders=1, avg=89.99, max=89.99
-
 Updated customer customer_002: total=312.56, orders=2
 Customer Totals> (customer_002,312.56,2)
+```
+
+### Lesson 3B: VIP Customer Detection
+```
+=== Flink Lesson 3B: VIP Customer Detection ===
+Real-time customer classification based on spending patterns
+
+VIP Status> customer_002: REGULAR (total: 156.78, orders: 1)
+VIP Status> customer_001: REGULAR (total: 89.99, orders: 1)
 VIP Status> customer_002: REGULAR (total: 312.56, orders: 2)
+🎉 TIER CHANGE: customer_002 upgraded to VIP (previous: REGULAR)
+VIP Status> customer_002: VIP (total: 567.34, orders: 3)
+```
+
+### Lesson 3C: Order Frequency Analysis
+```
+=== Flink Lesson 3C: Order Frequency Analysis ===
+Analyzing customer ordering behavior and frequency patterns
+
+📈 FREQUENCY CHANGE: customer_002 is now NEW CUSTOMER (order #1)
+Order Frequency> customer_002: 1 orders in session (NEW CUSTOMER)
+📈 FREQUENCY CHANGE: customer_002 is now OCCASIONAL (order #2)
 Order Frequency> customer_002: 2 orders in session (OCCASIONAL)
+📈 FREQUENCY CHANGE: customer_001 is now REGULAR (order #6)
+Order Frequency> customer_001: 6 orders in session (REGULAR)
+```
+
+### Lesson 3D: Category Spending Analysis
+```
+=== Flink Lesson 3D: Category Spending Analysis ===
+Analyzing spending patterns and performance by product category
+
+Category Analysis> Category Electronics: total=156.78, orders=1, avg=156.78, max=156.78
+Category Analysis> Category Books: total=89.99, orders=1, avg=89.99, max=89.99
+🏆 CATEGORY MILESTONE: Electronics reached $1K+ revenue milestone!
+Category Analysis> Category Electronics: total=1123.45, orders=4, avg=280.86, max=456.78
 ```
 
 ## Code Structure Explanation
