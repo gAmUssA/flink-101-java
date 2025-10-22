@@ -77,7 +77,7 @@ dependencies {
     val flinkShadowJar by configurations
     flinkShadowJar("org.apache.flink:flink-connector-kafka:$kafkaConnectorVersion")
     flinkShadowJar("org.apache.flink:flink-connector-base:$flinkVersion")
-    flinkShadowJar("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    flinkShadowJar("com.fasterxml.jackson.core:jackson-databind:2.20.0")
     
     // Table API and SQL for lessons 4-5 (commented until Flink 2.0 is released)
     // implementation("org.apache.flink:flink-table-api-java-bridge:$flinkVersion")
