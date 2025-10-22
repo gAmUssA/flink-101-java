@@ -49,7 +49,7 @@ repositories {
 val flinkVersion = "2.0.0"
 val kafkaConnectorVersion = "4.0.0-2.0"
 val slf4jVersion = "1.7.36"
-val log4jVersion = "2.20.0"
+val log4jVersion = "2.25.2"
 
 // Flink-specific configuration following official recommendations
 configurations {
@@ -77,7 +77,7 @@ dependencies {
     val flinkShadowJar by configurations
     flinkShadowJar("org.apache.flink:flink-connector-kafka:$kafkaConnectorVersion")
     flinkShadowJar("org.apache.flink:flink-connector-base:$flinkVersion")
-    flinkShadowJar("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    flinkShadowJar("com.fasterxml.jackson.core:jackson-databind:2.20.0")
     
     // Table API and SQL for lessons 4-5 (commented until Flink 2.0 is released)
     // implementation("org.apache.flink:flink-table-api-java-bridge:$flinkVersion")
