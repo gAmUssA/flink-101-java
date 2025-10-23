@@ -1,0 +1,135 @@
+= Flink 101 (Java) — How to Run Lessons and Prerequisites
+:toc:
+:toclevels: 3
+:icons: font
+
+A hands-on learning repo for Apache Flink 2.x with simple, runnable lessons and a Kafka-based data generator. This guide explains prerequisites, local runs, starting a minimal Flink cluster with Docker, and how to connect to Confluent Cloud Kafka.
+
+== Prerequisites
+- Java 17 (JDK). Verify: `java -version`
+- Git and Bash shell (macOS/Linux/WSL on Windows)
+- Docker Desktop or Docker Engine (optional, for the local Flink cluster)
+- Confluent Cloud account (optional, required for Kafka lessons) with:
+  * A Kafka cluster
+  * API Key and Secret
+  * A topic, e.g. `orders`
+
+You can validate the build setup at any time:
+
+[source,bash]
+----
+./gradlew validateSetup
+----
+
+== Project layout (essentials)
+- `src/main/java/com/example/flink/lesson01` — basic DataStream API
+- `src/main/java/com/example/flink/lesson02` — Kafka integration
+- `src/main/java/com/example/flink/lesson03` — stateful processing examples
+- `shared/` — shared utilities and data generators (Kafka producer)
+- `docs/lessons/` — per-lesson walkthroughs
+- `docs/kafka-producer-setup.md` — deeper guide for the Kafka producer
+
+== Confluent Cloud configuration (required for Kafka-based lessons)
+Kafka examples expect these environment variables. Create a local `.env` file and export:
+
+[source,bash]
+----
+# .env
+export CNFL_KAFKA_BROKER="your-broker-endpoint:9092"   # e.g. pkc-xxxxx.us-west-2.aws.confluent.cloud:9092
+export CNFL_KC_API_KEY="your-kafka-api-key"
+export CNFL_KC_API_SECRET="your-kafka-api-secret"
+----
+
+Load them into your shell before running anything that touches Kafka:
+
+[source,bash]
+----
+source .env
+----
+
+These variables are read by the code via `KafkaUtils` and are required by:
+- shared.data.generators.KafkaOrderProducer
+- lesson02 KafkaConsumerExample
+- lesson03 jobs
+
+== Quick start: run lessons locally (no Docker required)
+All lessons can be run directly with Gradle tasks. Open two terminals if you also plan to run the Kafka producer.
+
+=== Lesson 1 — WordCount (no Kafka)
+[source,bash]
+----
+./gradlew runLesson01
+----
+
+=== Lesson 2 — Kafka integration (consumes `orders` from Kafka)
+1. Ensure the Confluent Cloud variables are loaded: `source .env`
+2. Ensure the topic exists in your Kafka cluster (e.g., `orders`).
+3. Start the producer in a separate terminal (see next section) or push data another way.
+4. Run the lesson:
+
+[source,bash]
+----
+./gradlew runLesson02
+----
+
+=== Lesson 3 — Advanced processing (multiple focused jobs)
+Pick one of the focused jobs below:
+
+[source,bash]
+----
+./gradlew runLesson03A   # Customer Order Tracking
+./gradlew runLesson03B   # VIP Customer Detection
+./gradlew runLesson03C   # Order Frequency Analysis
+./gradlew runLesson03D   # Category Spending Analysis
+----
+
+== Generate data: Kafka Order Producer
+A companion generator continuously writes realistic order events to a Kafka topic (default: `orders`). It uses your Confluent Cloud credentials from the environment.
+
+[source,bash]
+----
+# 1) Ensure you exported the env vars
+source .env
+
+# 2) (One-time) create the topic in Confluent Cloud (via UI or CLI)
+# Example with confluent CLI:
+# confluent kafka topic create orders --partitions 3 --replication-factor 3
+
+# 3) Start the producer
+./gradlew runKafkaProducer
+----
+
+See docs/kafka-producer-setup.md for a deeper walkthrough and troubleshooting tips.
+
+== Start a local Flink cluster with Docker (optional)
+If you prefer running jobs on a local cluster with the Flink Web UI:
+
+[source,bash]
+----
+# Build a runnable (shadow) JAR first
+./gradlew shadowJar
+
+# Start the JobManager and TaskManager
+docker compose up -d
+
+# Open the Flink UI
+open http://localhost:8081   # macOS
+# xdg-open http://localhost:8081  # Linux alternative
+----
+
+The compose file mounts `build/libs` into `/opt/flink/usrlib`. You can then use the Flink UI to submit the JAR from that directory or upload a new one.
+
+== Troubleshooting
+- Missing env vars: ensure `source .env` was executed in the current terminal.
+- Authentication errors to Confluent Cloud: verify `CNFL_KC_API_KEY` and `CNFL_KC_API_SECRET` and cluster access.
+- Wrong bootstrap server: check `CNFL_KAFKA_BROKER` host and port (usually `:9092`).
+- No records in Lesson 2/3: confirm the producer is running and the topic exists.
+- Docker not starting: ensure Docker Desktop/Engine is running and ports are free.
+
+== Learn more
+- docs/lessons/lesson01/README.md
+- docs/lessons/lesson02/README.md
+- docs/lessons/lesson03/README.md
+- docs/kafka-producer-setup.md
+
+Happy streaming!
