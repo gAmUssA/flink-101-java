@@ -1,0 +1,127 @@
+= Flink 101 (Java)
+:toc: macro
+:toclevels: 2
+:icons: font
+:source-highlighter: highlightjs
+
+A hands-on set of small Apache Flink jobs written in Java. Use it to learn the DataStream API, integrate with Kafka, and practice common streaming patterns.
+
+NOTE: This repo targets Java 17 and Flink 2.0.0.
+
+toc::[]
+
+== Prerequisites
+
+- Java 17 JDK installed and on PATH (`java -version` should print 17.x)
+- Gradle (wrapper provided: run `./gradlew ...`)
+- Docker and Docker Compose (for running a local Flink cluster and Kafka)
+- ~2 CPU cores and 4+ GB RAM available
+
+Optional but useful:
+- A terminal with bash/zsh
+- An IDE (IntelliJ IDEA Community/Ultimate)
+
+== Project layout
+
+- `src/main/java` — lesson source code
+- `shared/` — shared utilities and data generators (e.g., Kafka producer)
+- `docs/lessons/` — step-by-step lesson guides
+- `docs/kafka-producer-setup.md` — how to start the sample Kafka producer
+- `docker-compose.yml` — single-node Flink cluster for local testing
+- `build.gradle.kts` — Gradle build with convenience run tasks
+
+== Quick start
+
+=== 1) Validate your setup
+
+Run a lightweight check that prints detected versions.
+
+----
+./gradlew validateSetup
+----
+
+=== 2) Run lessons locally (no Docker)
+
+Each lesson has a dedicated Gradle task that executes the job in a local JVM. This is the fastest way to iterate while learning.
+
+Examples:
+
+----
+# Lesson 1: Word count (in-memory data)
+./gradlew runLesson01
+
+# Lesson 2: Kafka consumer example
+./gradlew runLesson02
+
+# Lesson 3 variants
+./gradlew runLesson03A
+./gradlew runLesson03B
+./gradlew runLesson03C
+./gradlew runLesson03D
+
+# Table/SQL lessons (if present)
+./gradlew runLesson04
+./gradlew runLesson05
+----
+
+TIP: Open `docs/lessons/lesson01/README.md` while running `runLesson01` to follow the narrative.
+
+=== 3) Produce sample Kafka data (for Kafka-related lessons)
+
+If a lesson expects Kafka input, start the bundled producer. It generates an endless stream of orders.
+
+See detailed steps in `docs/kafka-producer-setup.md`, or run directly:
+
+----
+./gradlew runKafkaProducer
+----
+
+By default it targets `localhost:9092` and topic `orders` (see the producer class under `shared/`).
+
+=== 4) Run on a local Flink cluster with Docker (optional)
+
+This repo ships a simple JobManager + TaskManager stack. It mounts your built JARs into Flink’s `usrlib` directory.
+
+1. Build the job JAR:
++
+----
+./gradlew clean shadowJar
+----
+2. Start the cluster:
++
+----
+docker compose up -d
+----
+3. Open the Web UI at http://localhost:8081
+4. Submit the job JAR `build/libs/flink-demo.jar` via the UI and choose the lesson’s main class (e.g., `com.example.flink.lesson01.StreamingWordCount`).
+
+Notes:
+- Compose mounts `./build/libs` to `/opt/flink/usrlib` in the containers.
+- You can also use the Flink CLI inside the JobManager container to submit JARs if you prefer.
+
+== Frequently used commands
+
+----
+# Compile and run a lesson locally
+./gradlew runLesson01
+
+# Build shaded JAR for cluster submission
+./gradlew shadowJar
+
+# Start/stop Flink cluster
+docker compose up -d
+docker compose down
+----
+
+== Troubleshooting
+
+- "Class not found" when submitting in UI: make sure you built with `./gradlew shadowJar` and selected the correct main class.
+- Port 8081 already in use: stop conflicting services or change the mapped port in `docker-compose.yml`.
+- Kafka connection errors: ensure your local Kafka is running and the topic exists; start the included producer or your own stack. See `docs/kafka-producer-setup.md`.
+- Java version mismatch: ensure JDK 17. The build enforces source/target 17.
+
+== Where to go next
+
+- Start with: `docs/lessons/lesson01/README.md`
+- Need Kafka data? `docs/kafka-producer-setup.md`
+- Explore Gradle tasks in `build.gradle.kts` for more entry points.
