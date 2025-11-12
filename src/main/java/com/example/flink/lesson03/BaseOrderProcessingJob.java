@@ -1,6 +1,7 @@
 package com.example.flink.lesson03;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.Duration;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
@@ -10,11 +11,11 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.io.IOException;
-import java.time.Duration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shared.data.generators.Order;
 import shared.utils.KafkaUtils;
+import utils.FlinkEnvironmentConfig;
 
 /**
  * Base class for Order Processing Jobs
@@ -35,19 +36,10 @@ public abstract class BaseOrderProcessingJob {
 
     /**
      * Creates and configures the Flink execution environment
-     * with educational settings optimized for learning
+     * with educational settings optimized for learning and Web UI enabled
      */
     protected static StreamExecutionEnvironment createExecutionEnvironment() {
-        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        
-        // Configure for educational clarity
-        env.setParallelism(1);
-        env.disableOperatorChaining();
-        
-        // Enable checkpointing for fault tolerance
-        env.enableCheckpointing(60000); // Checkpoint every 60 seconds
-        
-        return env;
+        return FlinkEnvironmentConfig.createEnvironmentWithUI();
     }
 
     /**
@@ -97,6 +89,9 @@ public abstract class BaseOrderProcessingJob {
         System.out.println("=== " + jobName + " ===");
         System.out.println(description);
         System.out.println();
+        
+        // Print Web UI access instructions
+        FlinkEnvironmentConfig.printWebUIInstructions();
     }
 
     /**

@@ -128,9 +128,9 @@ public class SampleDataGenerator {
       int wordsInSentence = 3 + random.nextInt(8); // 3-10 words per sentence
 
       for (int j = 0; j < wordsInSentence; j++) {
-          if (j > 0) {
-              sentence.append(" ");
-          }
+        if (j > 0) {
+          sentence.append(" ");
+        }
         sentence.append(words[random.nextInt(words.length)]);
       }
 
@@ -145,23 +145,18 @@ public class SampleDataGenerator {
    * Makes it easy to switch between different datasets in lessons
    */
   public static List<String> getDataset(String datasetName) {
-    switch (datasetName.toLowerCase()) {
-      case "basic":
-        return getBasicWordCountData();
-      case "extended":
-        return getExtendedWordCountData();
-      case "ecommerce":
-        return getEcommerceData();
-      case "iot":
-        return getIoTSensorData();
-      case "mixed":
-        return getMixedComplexityData();
-      case "random":
-        return generateRandomSentences(20);
-      default:
+    return switch (datasetName.toLowerCase()) {
+      case "basic" -> getBasicWordCountData();
+      case "extended" -> getExtendedWordCountData();
+      case "ecommerce" -> getEcommerceData();
+      case "iot" -> getIoTSensorData();
+      case "mixed" -> getMixedComplexityData();
+      case "random" -> generateRandomSentences(20);
+      default -> {
         System.out.println("Unknown dataset: " + datasetName + ". Using basic dataset.");
-        return getBasicWordCountData();
-    }
+        yield getBasicWordCountData();
+      }
+    };
   }
 
   /**

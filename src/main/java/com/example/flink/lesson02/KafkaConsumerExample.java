@@ -1,6 +1,7 @@
 package com.example.flink.lesson02;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.time.Duration;
 
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
@@ -10,11 +11,11 @@ import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsIni
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-import java.io.IOException;
-import java.time.Duration;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shared.data.generators.Order;
 import shared.utils.KafkaUtils;
+import utils.FlinkEnvironmentConfig;
 
 /**
  * Lesson 2: Kafka Integration with Confluent Cloud (Order Processing)
@@ -58,15 +59,15 @@ public class KafkaConsumerExample {
 
   public static void main(String[] args) throws Exception {
 
-    // Step 1: Create the execution environment
-    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-    // Configure for educational clarity
-    env.setParallelism(1);
-    env.disableOperatorChaining();
+    // Step 1: Create the execution environment with Web UI enabled
+    StreamExecutionEnvironment env = FlinkEnvironmentConfig.createEnvironmentWithUI();
 
     System.out.println("=== Flink Lesson 2: Kafka Integration ===");
     System.out.println("Connecting to Confluent Cloud Kafka...");
+    System.out.println();
+    
+    // Print Web UI access instructions
+    FlinkEnvironmentConfig.printWebUIInstructions();
 
     // Step 2: Load Confluent Cloud configuration from environment variables
     // These should be set in your .env file and loaded into the environment
@@ -88,7 +89,7 @@ public class KafkaConsumerExample {
         .setProperties(KafkaUtils.createConsumerKafkaProperties(apiKey, apiSecret))
         .build();
 
-    // Step 4: Create data stream from Kafka source
+    // Step 4: Create data st ream from Kafka source
     // This creates a continuous stream of Order objects from your Kafka topic
     DataStream<Order> kafkaStream = env
         .fromSource(

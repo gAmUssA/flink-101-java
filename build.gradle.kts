@@ -8,8 +8,8 @@ group = "com.example.flink"
 version = "1.0.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 // Configure source sets to exclude documentation files
@@ -69,6 +69,7 @@ dependencies {
     // --------------------------------------------------------------
     implementation("org.apache.flink:flink-streaming-java:$flinkVersion")
     implementation("org.apache.flink:flink-clients:$flinkVersion")
+    implementation("org.apache.flink:flink-runtime-web:$flinkVersion")
     
     // --------------------------------------------------------------
     // Dependencies that should be part of the shadow jar, e.g.

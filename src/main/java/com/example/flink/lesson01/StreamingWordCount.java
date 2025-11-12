@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
 import shared.data.generators.SampleDataGenerator;
+import utils.FlinkEnvironmentConfig;
 
 /**
  * Lesson 1: DataStream API with In-Memory Data
@@ -41,20 +42,16 @@ public class StreamingWordCount {
 
   public static void main(String[] args) throws Exception {
 
-    // Step 1: Create the execution environment
-    // This is the main entry point for all Flink programs
-    StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-
-    // Configure for educational clarity - single parallelism makes it easier to follow
-    env.setParallelism(1);
-
-    // Disable operator chaining so we can see individual operators in the Web UI
-    // In production, you'd typically leave this enabled for better performance
-    env.disableOperatorChaining();
+    // Step 1: Create the execution environment with Web UI enabled
+    // This allows you to visualize your pipeline at http://localhost:8081
+    StreamExecutionEnvironment env = FlinkEnvironmentConfig.createEnvironmentWithUI();
 
     System.out.println("=== Flink Lesson 1: Streaming Word Count ===");
     System.out.println("Starting stream processing with in-memory data...");
     System.out.println();
+    
+    // Print Web UI access instructions
+    FlinkEnvironmentConfig.printWebUIInstructions();
 
     // Show available datasets for experimentation
     SampleDataGenerator.printAvailableDatasets();
@@ -89,8 +86,8 @@ public class StreamingWordCount {
     // 3. Count occurrences (sum) - aggregates across all data
     DataStream<Tuple2<String, Integer>> wordCounts = textLines
         .flatMap(new Tokenizer())                                    // Split lines into words
-        .keyBy(value -> value.f0)                                   // Group by word (first field)
-        .sum(1);                                                    // Sum the counts (second field)
+        .keyBy(value -> value.f0)            // Group by word (first field)
+        .sum(1);                                     // Sum the counts (second field)
 
     // Step 4: Output the results
     // In production, you might write to Kafka, databases, or files

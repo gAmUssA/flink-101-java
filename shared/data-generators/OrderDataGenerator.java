@@ -1,6 +1,9 @@
 package shared.data.generators;
 
-import org.apache.flink.streaming.api.functions.source.legacy.SourceFunction;
+import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.connector.source.Source;
+import org.apache.flink.connector.datagen.source.DataGeneratorSource;
+import org.apache.flink.connector.datagen.source.GeneratorFunction;
 
 import java.util.Random;
 
@@ -10,43 +13,82 @@ import java.util.Random;
  * This utility generates realistic e-commerce order data for stream processing demonstrations.
  * Designed for educational clarity - creates orders with realistic patterns and timing.
  * <p>
+ * Updated to use Flink 2.0 FLIP-27 Source API (DataGeneratorSource) instead of deprecated SourceFunction.
+ * <p>
  * Usage Examples:
  * - Use in Kafka producers to generate test data
  * - Experiment with different order patterns and frequencies
  * - Test various customer and product scenarios
  */
-public class OrderDataGenerator implements SourceFunction<Order> {
+public class OrderDataGenerator {
     
-    private volatile boolean running = true;
-    private final Random random = new Random();
-    private final String[] customers = {"customer_001", "customer_002", "customer_003", "customer_004", "customer_005"};
-    private final String[] categories = {"Electronics", "Clothing", "Books", "Home", "Sports"};
+    private static final String[] CUSTOMERS = {"customer_001", "customer_002", "customer_003", "customer_004", "customer_005"};
+    private static final String[] CATEGORIES = {"Electronics", "Clothing", "Books", "Home", "Sports"};
 
-    @Override
-    public void run(SourceContext<Order> ctx) throws Exception {
-        int orderCounter = 1;
+    /**
+     * Creates a DataGeneratorSource that generates Order objects.
+     * 
+     * @param numberOfOrders Maximum number of orders to generate (use Long.MAX_VALUE for unbounded)
+     * @return A Source that generates Order objects
+     */
+    public static Source<Order, ?, ?> createSource(long numberOfOrders) {
+        GeneratorFunction<Long, Order> generatorFunction = new OrderGeneratorFunction();
         
-        while (running) {
-            // Generate random order
-            String orderId = "order_" + String.format("%05d", orderCounter++);
-            String customerId = customers[random.nextInt(customers.length)];
+        return new DataGeneratorSource<>(
+            generatorFunction,
+            numberOfOrders,
+            TypeInformation.of(Order.class)
+        );
+    }
+
+    /**
+     * Creates an unbounded source that generates orders continuously.
+     * 
+     * @return A Source that generates orders continuously
+     */
+    public static Source<Order, ?, ?> createUnboundedSource() {
+        return createSource(Long.MAX_VALUE);
+    }
+
+    /**
+     * Creates a bounded source with a specific number of orders.
+     * 
+     * @param numberOfOrders Number of orders to generate
+     * @return A Source that generates the specified number of orders
+     */
+    public static Source<Order, ?, ?> createBoundedSource(long numberOfOrders) {
+        return createSource(numberOfOrders);
+    }
+
+    /**
+     * GeneratorFunction implementation that creates Order objects.
+     * Thread-safe as each parallel instance gets its own Random instance.
+     */
+    private static class OrderGeneratorFunction implements GeneratorFunction<Long, Order> {
+        private static final long serialVersionUID = 1L;
+        
+        // Thread-local Random for thread safety in parallel execution
+        private transient Random random;
+
+        @Override
+        public Order map(Long index) throws Exception {
+            if (random == null) {
+                random = new Random();
+            }
+            
+            // Generate random order based on index
+            String orderId = "order_" + String.format("%05d", index);
+            String customerId = CUSTOMERS[random.nextInt(CUSTOMERS.length)];
             double amount = 10.0 + (random.nextDouble() * 490.0); // $10-$500
-            String category = categories[random.nextInt(categories.length)];
+            String category = CATEGORIES[random.nextInt(CATEGORIES.length)];
             long timestamp = System.currentTimeMillis();
             
             Order order = new Order(orderId, customerId, amount, timestamp, category);
-            ctx.collect(order);
             
             // Educational debugging
             System.out.println("Generated Order> " + order);
             
-            // Wait between orders (2-4 seconds for better observation)
-            Thread.sleep(2000 + random.nextInt(2000));
+            return order;
         }
-    }
-
-    @Override
-    public void cancel() {
-        running = false;
     }
 }
