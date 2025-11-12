@@ -1,5 +1,6 @@
 package com.example.flink.lesson05.queries;
 
+import com.example.flink.lesson05.utils.ChangelogFormatter;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -44,9 +45,11 @@ public class CategoryPerformance {
         
         Table resultTable = tableEnv.sqlQuery(query);
         
-        // Convert to DataStream and print results
+        // Convert to DataStream with formatted output
         DataStream<Row> resultStream = tableEnv.toChangelogStream(resultTable);
-        resultStream.print("Category Performance");
+        resultStream
+            .map(ChangelogFormatter.detailed("Category Performance"))
+            .print();
         
         System.out.println("✓ Category performance query registered\n");
     }

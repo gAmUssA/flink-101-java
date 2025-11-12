@@ -1,5 +1,6 @@
 package com.example.flink.lesson05.queries;
 
+import com.example.flink.lesson05.utils.ChangelogFormatter;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -40,9 +41,11 @@ public class CustomerSpendingSummary {
                 $("category").count().distinct().as("categories_purchased")
             );
         
-        // Convert to DataStream and print results
+        // Convert to DataStream with formatted output
         DataStream<Row> resultStream = tableEnv.toChangelogStream(resultTable);
-        resultStream.print("Customer Spending");
+        resultStream
+            .map(ChangelogFormatter.detailed("Customer Spending"))
+            .print();
         
         System.out.println("✓ Customer spending summary query registered\n");
     }
@@ -72,9 +75,11 @@ public class CustomerSpendingSummary {
         
         Table resultTable = tableEnv.sqlQuery(query);
         
-        // Convert to DataStream and print results
+        // Convert to DataStream with formatted output
         DataStream<Row> resultStream = tableEnv.toChangelogStream(resultTable);
-        resultStream.print("Customer Spending");
+        resultStream
+            .map(ChangelogFormatter.detailed("Customer Spending (SQL)"))
+            .print();
         
         System.out.println("✓ Customer spending summary query registered\n");
     }

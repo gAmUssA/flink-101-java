@@ -178,6 +178,13 @@ tasks.register<JavaExec>("runLesson05") {
     mainClass.set("com.example.flink.lesson05.TableAPIExample")
 }
 
+tasks.register<JavaExec>("runColorDemo") {
+    group = "lessons"
+    description = "Run Color Demo for ChangelogFormatter"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("com.example.flink.lesson05.ColorDemo")
+}
+
 tasks.register<JavaExec>("runKafkaProducer") {
     group = "kafka"
     description = "Run Kafka Order Producer - generates continuous Order data for testing"

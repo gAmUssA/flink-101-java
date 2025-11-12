@@ -4,6 +4,8 @@ import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.connector.datagen.source.DataGeneratorSource;
 import org.apache.flink.connector.datagen.source.GeneratorFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
@@ -66,6 +68,7 @@ public class OrderDataGenerator {
      */
     private static class OrderGeneratorFunction implements GeneratorFunction<Long, Order> {
         private static final long serialVersionUID = 1L;
+        private static final Logger LOG = LoggerFactory.getLogger(OrderGeneratorFunction.class);
         
         // Thread-local Random for thread safety in parallel execution
         private transient Random random;
@@ -85,8 +88,8 @@ public class OrderDataGenerator {
             
             Order order = new Order(orderId, customerId, amount, timestamp, category);
             
-            // Educational debugging
-            System.out.println("Generated Order> " + order);
+            // Educational debugging at debug level
+            LOG.debug("Generated Order> {}", order);
             
             return order;
         }

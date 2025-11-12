@@ -1,5 +1,6 @@
 package com.example.flink.lesson05.queries;
 
+import com.example.flink.lesson05.utils.ChangelogFormatter;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.table.api.Table;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -72,9 +73,11 @@ public class HourlySalesMetrics {
         
         Table resultTable = tableEnv.sqlQuery(query);
         
-        // Convert to DataStream and print results
+        // Convert to DataStream with formatted output
         DataStream<Row> resultStream = tableEnv.toChangelogStream(resultTable);
-        resultStream.print("Hourly Sales");
+        resultStream
+            .map(ChangelogFormatter.detailed("Hourly Sales"))
+            .print();
         
         System.out.println("✓ Hourly sales metrics query registered\n");
     }

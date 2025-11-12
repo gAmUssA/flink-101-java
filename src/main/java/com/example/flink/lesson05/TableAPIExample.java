@@ -111,16 +111,16 @@ public class TableAPIExample {
     System.out.println("✓ Converted DataStream to Table 'orders'\n");
 
     // Step 5: Customer Spending Summary (from customer-spending-summary.flink.sql)
-    runCustomerSpendingSummary(tableEnv);
+   // runCustomerSpendingSummary(tableEnv);
 
     // Step 6: Customer Segmentation (from customer-segmentation.flink.sql)
-   // runCustomerSegmentation(tableEnv);
+   runCustomerSegmentation(tableEnv);
 
     // Step 7: Category Performance (from category-performance.flink.sql)
     //runCategoryPerformance(tableEnv);
 
     // Step 8: Hourly Sales Metrics (from hourly-sales-metrics.flink.sql)
-    //runHourlySalesMetrics(tableEnv);
+   // runHourlySalesMetrics(tableEnv);
 
     System.out.println("\n=== Lesson Complete ===");
     System.out.println("All Table API queries executed successfully!");
