@@ -45,7 +45,6 @@ Thumbs.db
 # Flink runtime artifacts
 checkpoints/
 savepoints/
-data/
 logs/
 *.log
 
@@ -122,7 +121,6 @@ htmlcov/
 !docs/
 !src/
 !config/
-!shared/
 !README.md
 !*.md
 

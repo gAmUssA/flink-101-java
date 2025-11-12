@@ -46,8 +46,8 @@ repositories {
     }
 }
 
-val flinkVersion = "2.0.0"
-val kafkaConnectorVersion = "4.0.0-2.0"
+val flinkVersion = "2.1.0"
+val kafkaConnectorVersion = "4.0.1-2.0"
 val slf4jVersion = "1.7.36"
 val log4jVersion = "2.25.2"
 

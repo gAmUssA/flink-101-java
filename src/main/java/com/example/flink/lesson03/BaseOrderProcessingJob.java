@@ -43,12 +43,16 @@ public abstract class BaseOrderProcessingJob {
     }
 
     /**
-     * Creates a Kafka source for Order objects with Confluent Cloud integration
-     * 
+     * Creates a Kafka source for Order objects with Confluent Cloud integration.
+     * <p> 
      * This method handles all the common Kafka configuration including:
+     * <p> 
      * - Environment variable loading
+     * <p> 
      * - Confluent Cloud authentication
+     * <p> 
      * - JSON deserialization
+     * <p> 
      * - Consumer group configuration
      */
     protected static DataStream<Order> createOrderStream(StreamExecutionEnvironment env, String consumerGroupId) {
