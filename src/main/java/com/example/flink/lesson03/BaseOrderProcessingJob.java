@@ -14,7 +14,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import shared.data.generators.Order;
-import shared.utils.KafkaUtils;
+import utils.KafkaUtils;
 import utils.FlinkEnvironmentConfig;
 
 /**

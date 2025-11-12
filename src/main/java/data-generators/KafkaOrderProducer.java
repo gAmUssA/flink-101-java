@@ -2,16 +2,13 @@ package shared.data.generators;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.Future;
 
-import shared.utils.KafkaUtils;
+import utils.KafkaUtils;
 
 /**
  * Kafka Order Producer for Educational Flink Lessons

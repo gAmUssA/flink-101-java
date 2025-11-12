@@ -16,7 +16,7 @@ java {
 sourceSets {
     main {
         java {
-            srcDirs("src/main/java", "shared")
+            srcDirs("src/main/java")
             exclude("**/*.md", "**/*.txt", "**/*.rst")
         }
         resources {
@@ -80,9 +80,9 @@ dependencies {
     flinkShadowJar("org.apache.flink:flink-connector-base:$flinkVersion")
     flinkShadowJar("com.fasterxml.jackson.core:jackson-databind:2.20.0")
     
-    // Table API and SQL for lessons 4-5 (commented until Flink 2.0 is released)
-    // implementation("org.apache.flink:flink-table-api-java-bridge:$flinkVersion")
-    // implementation("org.apache.flink:flink-table-planner:$flinkVersion")
+    // Table API and SQL for lessons 4-5
+    implementation("org.apache.flink:flink-table-api-java-bridge:$flinkVersion")
+    implementation("org.apache.flink:flink-table-planner_2.12:$flinkVersion")
     
     // Runtime logging dependencies
     runtimeOnly("org.apache.logging.log4j:log4j-slf4j-impl:$log4jVersion")
