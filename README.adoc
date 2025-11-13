@@ -137,7 +137,7 @@ docker compose down -v
 
 Notes:
 
-- Compose file: `docker-compose.yml` uses the official `flink:2.0.0-scala_2.12-java21` images and mounts `./build/libs` into the cluster.
+- Compose file: `docker-compose.yml` uses the official `flink:2.1.0-scala_2.12-java21` images and mounts `./build/libs` into the cluster.
 - Configuration and ports are documented inline in the compose file. The Web UI is published at `http://localhost:8081`.
 
 == Building and testing
