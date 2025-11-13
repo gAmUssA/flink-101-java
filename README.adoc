@@ -154,7 +154,7 @@ Notes:
 Dependency highlights from `build.gradle.kts`:
 
 - Flink core: `flink-streaming-java`, `flink-clients`, `flink-runtime-web`
-- Connectors in shaded JAR: `flink-connector-kafka:{4.0.1-2.0}`
+- Connectors in shaded JAR: `flink-connector-kafka:4.0.1-2.0`
 - Logging: Log4j 2 bridge for SLF4J runtime
 - Java toolchain: `sourceCompatibility`/`targetCompatibility` set to {java-version}
 
