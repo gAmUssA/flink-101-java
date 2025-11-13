@@ -1,0 +1,188 @@
+= Flink 101 (Java)
+:toc: macro
+:toclevels: 3
+:icons: font
+:source-highlighter: highlightjs
+:sectanchors:
+:project-name: flink-101-java
+:java-version: 21
+:flink-version: 2.1.0
+
+A hands‑on learning project for Apache Flink using Java. It contains bite‑sized lessons that progressively introduce the DataStream API, Kafka integration, stateful processing, and the Table API/SQL. The project ships with Gradle tasks to run each lesson locally and a minimal Docker Compose Flink cluster for experimentation.
+
+NOTE: The latest verified context for this repository is November 13, 2025.
+
+
+[toc]
+
+== Quick start
+
+. Prerequisites
+- Java {java-version}
+- Gradle (the included Gradle Wrapper `./gradlew` is recommended)
+- Docker Desktop or Docker Engine (optional, for running a local Flink cluster and Web UI)
+- Kafka (optional) or Confluent Cloud for Lesson 2 and Lesson 3 data streams
+
+. Clone and validate
+[source,shell]
+----
+./gradlew validateSetup
+----
+
+. Run your first job (Lesson 1: in‑memory word count)
+[source,shell]
+----
+./gradlew runLesson01
+----
+
+== What’s inside
+
+- Build tool: Gradle Kotlin DSL
+- Java: {java-version}
+- Flink: {flink-version}
+- Organized lessons with runnable tasks and example data generators
+
+Directory highlights:
+
+- `src/main/java/com/example/flink/lesson01/StreamingWordCount.java` — Basics of the DataStream API
+- `src/main/java/com/example/flink/lesson02/KafkaConsumerExample.java` — Consuming Orders from Kafka
+- `src/main/java/com/example/flink/lesson03/*` — Several real‑world mini jobs (customer totals, VIP detection, frequency & category analysis)
+- `src/main/java/com/example/flink/lesson05/*` — Table API and helpful utilities (incl. Color demo)
+- `src/main/java/shared/data/generators/*` — Reusable sample data + Kafka producer
+- `docs/` — Additional guides, e.g., Kafka producer setup and step‑by‑step lessons
+
+== Running the lessons (locally)
+
+All lessons are available as Gradle run tasks:
+
+[source,shell]
+----
+# Lesson 1 — DataStream API basics
+./gradlew runLesson01
+
+# Lesson 2 — Kafka integration (requires access to a Kafka cluster)
+./gradlew runLesson02
+
+# Lesson 3 — Decomposed use‑cases (each task runs a different job)
+./gradlew runLesson03A   # Customer totals and order counts
+./gradlew runLesson03B   # VIP customer detection
+./gradlew runLesson03C   # Order frequency analysis
+./gradlew runLesson03D   # Category spending analysis
+
+# Lesson 5 — Table API / SQL
+./gradlew runLesson05
+
+# Utility — colorful console demo
+./gradlew runColorDemo
+
+# Data generator — Kafka Order producer (for lessons 2–3)
+./gradlew runKafkaProducer
+----
+
+TIP: If you see classpath or version messages, that’s expected — the project prints them via the `validateSetup` task to confirm your environment.
+
+== Kafka data for Lesson 2 and Lesson 3
+
+For streaming input, you can either point to your own Kafka cluster or use Confluent Cloud. A guided setup (topics, environment variables, CLI snippets, troubleshooting) is provided in:
+
+- link:docs/kafka-producer-setup.md[docs/kafka-producer-setup.md]
+
+At a glance:
+
+- Expected topic: `orders`
+- Producer task: `./gradlew runKafkaProducer`
+- Consumer tasks: `./gradlew runLesson02` and Lesson 3 variants
+
+The producer reads the following environment variables (Confluent Cloud example):
+
+[source,shell]
+----
+export CNFL_KAFKA_BROKER=your-broker:9092
+export CNFL_KC_API_KEY=your-api-key
+export CNFL_KC_API_SECRET=your-api-secret
+----
+
+== Running on a local Flink cluster (Docker)
+
+A minimal two‑container Flink cluster is provided via Docker Compose. It maps the project’s fat JARs to `/opt/flink/usrlib` and exposes the Web UI.
+
+. Build the shadow (uber) JAR
+[source,shell]
+----
+./gradlew clean shadowJar
+ls -1 build/libs
+# flink-demo.jar  <— artifact placed here by the Shadow plugin
+----
+
+. Start the cluster
+[source,shell]
+----
+docker compose up -d
+# Web UI: http://localhost:8081
+----
+
+. Submit a job (example with the default main class)
+[source,shell]
+----
+docker compose exec jobmanager \
+  flink run -c com.example.flink.lesson01.StreamingWordCount \
+  /opt/flink/usrlib/flink-demo.jar
+----
+
+. Stop the cluster
+[source,shell]
+----
+docker compose down -v
+----
+
+Notes:
+
+- Compose file: `docker-compose.yml` uses the official `flink:2.0.0-scala_2.12-java21` images and mounts `./build/libs` into the cluster.
+- Configuration and ports are documented inline in the compose file. The Web UI is published at `http://localhost:8081`.
+
+== Building and testing
+
+[source,shell]
+----
+# Compile & create an uber JAR with connectors
+./gradlew clean build shadowJar
+
+# Lint‑like basic validation
+./gradlew validateSetup
+----
+
+Dependency highlights from `build.gradle.kts`:
+
+- Flink core: `flink-streaming-java`, `flink-clients`, `flink-runtime-web`
+- Connectors in shaded JAR: `flink-connector-kafka:{4.0.1-2.0}`
+- Logging: Log4j 2 bridge for SLF4J runtime
+- Java toolchain: `sourceCompatibility`/`targetCompatibility` set to {java-version}
+
+== Lessons map
+
+- Lesson 1: DataStream API basics → `runLesson01`
+- Lesson 2: Kafka integration → `runLesson02`
+- Lesson 3A: Customer totals & counts → `runLesson03A`
+- Lesson 3B: VIP customer detection → `runLesson03B`
+- Lesson 3C: Order frequency analysis → `runLesson03C`
+- Lesson 3D: Category spending analysis → `runLesson03D`
+- Lesson 5: Table API and SQL → `runLesson05`
+
+For step‑by‑step exercises, also see:
+
+- link:docs/lessons/lesson01/README.md[docs/lessons/lesson01/README.md]
+
+== Troubleshooting
+
+- Java version errors: ensure `java -version` reports {java-version}+ and re‑run with the wrapper: `./gradlew ...`
+- Kafka auth/topic issues: follow link:docs/kafka-producer-setup.md[Kafka producer setup guide]; verify environment variables and that the `orders` topic exists.
+- Port conflicts on 8081: stop other services using the port or change the mapping in `docker-compose.yml`.
+- Shaded JAR not found in Docker: run `./gradlew shadowJar` before `docker compose up`.
+
+== Contributing
+
+Small improvements, fixes, and ideas are very welcome. Keep changes focused (especially in lessons) and prefer incremental, self‑contained commits.
+
+== License
+
+This project is distributed under the terms of the Apache License 2.0. See link:LICENSE.txt[LICENSE.txt].
