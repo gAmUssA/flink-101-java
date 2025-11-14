@@ -1,13 +1,17 @@
 plugins {
     java
     application
-    id("com.gradleup.shadow") version "8.3.8"
+    id("com.gradleup.shadow") version "8.3.9"
 }
 
 group = "com.example.flink"
 version = "1.0.0"
 
 java {
+    // Ensure Gradle uses JDK 21 regardless of the host JDK
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
 }
@@ -48,8 +52,7 @@ repositories {
 
 val flinkVersion = "2.1.0"
 val kafkaConnectorVersion = "4.0.1-2.0"
-val slf4jVersion = "1.7.36"
-val log4jVersion = "2.25.2"
+val log4jVersion = "2.24.3"
 
 // Flink-specific configuration following official recommendations
 configurations {
