@@ -6,7 +6,7 @@
 :sectanchors:
 :project-name: flink-101-java
 :java-version: 21
-:flink-version: 2.1.0
+:flink-version: 2.1.1
 
 A hands‑on learning project for Apache Flink using Java. It contains bite‑sized lessons that progressively introduce the DataStream API, Kafka integration, stateful processing, and the Table API/SQL. The project ships with Gradle tasks to run each lesson locally and a minimal Docker Compose Flink cluster for experimentation.
 
@@ -137,7 +137,7 @@ docker compose down -v
 
 Notes:
 
-- Compose file: `docker-compose.yml` uses the official `flink:2.1.0-scala_2.12-java21` images and mounts `./build/libs` into the cluster.
+- Compose file: `docker-compose.yml` uses the official `flink:2.1.1-scala_2.12-java21` images and mounts `./build/libs` into the cluster.
 - Configuration and ports are documented inline in the compose file. The Web UI is published at `http://localhost:8081`.
 
 == Building and testing
