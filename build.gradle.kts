@@ -52,7 +52,7 @@ repositories {
 
 val flinkVersion = "2.1.0"
 val kafkaConnectorVersion = "4.0.1-2.0"
-val log4jVersion = "2.24.3"
+val log4jVersion = "2.25.3"
 
 // Flink-specific configuration following official recommendations
 configurations {
