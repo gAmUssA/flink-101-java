@@ -63,7 +63,7 @@ public abstract class BaseOrderProcessingJob {
         // Load Confluent Cloud configuration from environment variables
         String bootstrapServers = KafkaUtils.getEnvVar(
             "CFLT_KAFKA_BROKER",
-            "your-kafka-broker:9092"
+            "localhost:9092"
         );
         String apiKey = KafkaUtils.getEnvVar("CFLT_KC_API_KEY", "your-api-key");
         String apiSecret = KafkaUtils.getEnvVar(
