@@ -42,9 +42,9 @@ This enables continuous testing of Flink streaming applications like OrderProces
 Ensure your `.env` file contains the required Confluent Cloud credentials:
 
 ```bash
-export CNFL_KAFKA_BROKER=your-broker-endpoint:9092
-export CNFL_KC_API_KEY=your-kafka-api-key
-export CNFL_KC_API_SECRET=your-kafka-api-secret
+export CFLT_KAFKA_BROKER=your-broker-endpoint:9092
+export CFLT_KC_API_KEY=your-kafka-api-key
+export CFLT_KC_API_SECRET=your-kafka-api-secret
 ```
 
 Load the environment variables:
@@ -69,11 +69,11 @@ Run the producer to generate continuous order data:
 **Expected Output:**
 ```
 === Kafka Order Producer ===
-Connecting to Confluent Cloud Kafka...
-✓ Loaded CNFL_KAFKA_BROKER from environment
-✓ Loaded CNFL_KC_API_KEY from environment
-✓ Loaded CNFL_KC_API_SECRET from environment
-✓ Kafka producer configured for Confluent Cloud
+Connecting to Kafka...
+✓ Loaded CFLT_KAFKA_BROKER from environment
+✓ Loaded CFLT_KC_API_KEY from environment
+✓ Loaded CFLT_KC_API_SECRET from environment
+✓ Kafka producer configured for Confluent Cloud (SASL_SSL)
 Starting continuous order generation... Press Ctrl+C to stop.
 Sent Order> Order{id=order_00001, customer=customer_002, amount=156.78, category=Electronics}
   ✓ Delivered to partition 1 at offset 12345

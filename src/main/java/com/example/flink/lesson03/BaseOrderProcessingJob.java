@@ -1,8 +1,8 @@
 package com.example.flink.lesson03;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.Duration;
-
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -10,20 +10,17 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import shared.data.generators.Order;
-import utils.KafkaUtils;
 import utils.FlinkEnvironmentConfig;
+import utils.KafkaUtils;
 
 /**
  * Base class for Order Processing Jobs
- * <p> 
+ * <p>
  * This class provides common Kafka integration setup and utilities that are shared
  * across all order processing jobs. It eliminates code duplication while allowing
  * each job to focus on its specific processing logic.
- * <p> 
+ * <p>
  * Educational Benefits:
  * - Demonstrates proper code organization and reuse
  * - Shows how to create base classes for common functionality
@@ -44,24 +41,35 @@ public abstract class BaseOrderProcessingJob {
 
     /**
      * Creates a Kafka source for Order objects with Confluent Cloud integration.
-     * <p> 
+     * <p>
      * This method handles all the common Kafka configuration including:
-     * <p> 
+     * <p>
      * - Environment variable loading
-     * <p> 
+     * <p>
      * - Confluent Cloud authentication
-     * <p> 
+     * <p>
      * - JSON deserialization
-     * <p> 
+     * <p>
      * - Consumer group configuration
      */
-    protected static DataStream<Order> createOrderStream(StreamExecutionEnvironment env, String consumerGroupId) {
-        System.out.println("Connecting to Confluent Cloud Kafka for order data...");
+    protected static DataStream<Order> createOrderStream(
+        StreamExecutionEnvironment env,
+        String consumerGroupId
+    ) {
+        System.out.println(
+            "Connecting to Kafka for order data..."
+        );
 
         // Load Confluent Cloud configuration from environment variables
-        String bootstrapServers = KafkaUtils.getEnvVar("CNFL_KAFKA_BROKER", "your-kafka-broker:9092");
-        String apiKey = KafkaUtils.getEnvVar("CNFL_KC_API_KEY", "your-api-key");
-        String apiSecret = KafkaUtils.getEnvVar("CNFL_KC_API_SECRET", "your-api-secret");
+        String bootstrapServers = KafkaUtils.getEnvVar(
+            "CFLT_KAFKA_BROKER",
+            "localhost:9092"
+        );
+        String apiKey = KafkaUtils.getEnvVar("CFLT_KC_API_KEY", "your-api-key");
+        String apiSecret = KafkaUtils.getEnvVar(
+            "CFLT_KC_API_SECRET",
+            "your-api-secret"
+        );
 
         System.out.println("Bootstrap servers: " + bootstrapServers);
         System.out.println("Using topic: " + TOPIC_NAME);
@@ -74,14 +82,17 @@ public abstract class BaseOrderProcessingJob {
             .setGroupId(consumerGroupId)
             .setStartingOffsets(OffsetsInitializer.latest()) // Start from latest messages for real-time processing
             .setValueOnlyDeserializer(new OrderJsonDeserializer())
-            .setProperties(KafkaUtils.createConsumerKafkaProperties(apiKey, apiSecret))
+            .setProperties(
+                KafkaUtils.createConsumerKafkaProperties(apiKey, apiSecret)
+            )
             .build();
 
         // Create data stream from Kafka source
         return env.fromSource(
             kafkaSource,
-            WatermarkStrategy.<Order>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                .withTimestampAssigner((order, timestamp) -> order.timestamp),
+            WatermarkStrategy.<Order>forBoundedOutOfOrderness(
+                Duration.ofSeconds(5)
+            ).withTimestampAssigner((order, timestamp) -> order.timestamp),
             "Kafka Order Source"
         );
     }
@@ -93,7 +104,7 @@ public abstract class BaseOrderProcessingJob {
         System.out.println("=== " + jobName + " ===");
         System.out.println(description);
         System.out.println();
-        
+
         // Print Web UI access instructions
         FlinkEnvironmentConfig.printWebUIInstructions();
     }
@@ -101,7 +112,10 @@ public abstract class BaseOrderProcessingJob {
     /**
      * Executes the job with proper error handling and educational messaging
      */
-    protected static void executeJob(StreamExecutionEnvironment env, String jobName) throws Exception {
+    protected static void executeJob(
+        StreamExecutionEnvironment env,
+        String jobName
+    ) throws Exception {
         System.out.println("Starting " + jobName + "... Press Ctrl+C to stop.");
         env.execute(jobName);
     }
@@ -110,7 +124,9 @@ public abstract class BaseOrderProcessingJob {
      * JSON Deserializer for Order objects from Kafka
      * Handles conversion from JSON strings to Order objects
      */
-    public static class OrderJsonDeserializer extends AbstractDeserializationSchema<Order> {
+    public static class OrderJsonDeserializer
+        extends AbstractDeserializationSchema<Order>
+    {
 
         private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -121,8 +137,13 @@ public abstract class BaseOrderProcessingJob {
                 Order order = objectMapper.readValue(message, Order.class);
                 return order;
             } catch (Exception e) {
-                System.err.println("[ERROR] Failed to deserialize message: " + new String(message));
-                System.err.println("[ERROR] Deserialization error: " + e.getMessage());
+                System.err.println(
+                    "[ERROR] Failed to deserialize message: " +
+                        new String(message)
+                );
+                System.err.println(
+                    "[ERROR] Deserialization error: " + e.getMessage()
+                );
                 e.printStackTrace();
                 throw e;
             }

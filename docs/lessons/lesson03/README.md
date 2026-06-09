@@ -41,9 +41,9 @@ By the end of this lesson, you will understand:
 ### Environment Variables Required
 Make sure your `.env` file contains:
 ```bash
-export CNFL_KAFKA_BROKER=your-broker-endpoint:9092
-export CNFL_KC_API_KEY=your-kafka-api-key
-export CNFL_KC_API_SECRET=your-kafka-api-secret
+export CFLT_KAFKA_BROKER=your-broker-endpoint:9092
+export CFLT_KC_API_KEY=your-kafka-api-key
+export CFLT_KC_API_SECRET=your-kafka-api-secret
 ```
 
 ### Data Generator Setup
