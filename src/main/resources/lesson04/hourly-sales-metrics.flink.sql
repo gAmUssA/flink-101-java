@@ -9,10 +9,10 @@
 --
 -- Use case: Real-time dashboards, performance monitoring, trend analysis
 
-CREATE VIEW hourly_sales_metrics AS
+CREATE TABLE hourly_sales_metrics AS
 SELECT 
-    TUMBLE_START(order_time, INTERVAL '1' HOUR) as hour_start,
-    TUMBLE_END(order_time, INTERVAL '1' HOUR) as hour_end,
+    window_start as hour_start,
+    window_end as hour_end,
     COUNT(*) as total_orders,
     SUM(amount) as total_revenue,
     AVG(amount) as avg_order_value,
@@ -20,5 +20,5 @@ SELECT
     COUNT(DISTINCT category) as categories_sold,
     MAX(amount) as max_order_amount,
     MIN(amount) as min_order_amount
-FROM orders
-GROUP BY TUMBLE(order_time, INTERVAL '1' HOUR);
+FROM TUMBLE(TABLE orders, DESCRIPTOR(TO_TIMESTAMP_LTZ(`timestamp`, 3)), INTERVAL '1' HOUR)
+GROUP BY window_start, window_end;
