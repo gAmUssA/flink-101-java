@@ -25,5 +25,5 @@ SELECT
     COUNT(DISTINCT category) as categories_sold,
     MAX(amount) as max_order_amount,
     MIN(amount) as min_order_amount
-FROM TUMBLE(TABLE orders, DESCRIPTOR(order_time), INTERVAL '1' HOUR)
+FROM TABLE(TUMBLE(TABLE orders, DESCRIPTOR(order_time), INTERVAL '1' HOUR))
 GROUP BY window_start, window_end;
