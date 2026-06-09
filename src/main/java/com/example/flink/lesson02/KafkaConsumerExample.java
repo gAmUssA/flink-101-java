@@ -60,7 +60,7 @@ public class KafkaConsumerExample {
             FlinkEnvironmentConfig.createEnvironmentWithUI();
 
         System.out.println("=== Flink Lesson 2: Kafka Integration ===");
-        System.out.println("Connecting to Confluent Cloud Kafka...");
+        System.out.println("Connecting to Kafka...");
         System.out.println();
 
         // Print Web UI access instructions
@@ -94,7 +94,7 @@ public class KafkaConsumerExample {
             )
             .build();
 
-        // Step 4: Create data st ream from Kafka source
+        // Step 4: Create data stream from Kafka source
         // This creates a continuous stream of Order objects from your Kafka topic
         DataStream<Order> kafkaStream = env.fromSource(
             kafkaSource,

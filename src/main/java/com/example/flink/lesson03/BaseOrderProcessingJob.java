@@ -57,7 +57,7 @@ public abstract class BaseOrderProcessingJob {
         String consumerGroupId
     ) {
         System.out.println(
-            "Connecting to Confluent Cloud Kafka for order data..."
+            "Connecting to Kafka for order data..."
         );
 
         // Load Confluent Cloud configuration from environment variables

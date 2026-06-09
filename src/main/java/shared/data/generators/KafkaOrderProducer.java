@@ -28,7 +28,7 @@ import utils.KafkaUtils;
  *
  * Expected Output:
  * === Kafka Order Producer ===
- * Connecting to Confluent Cloud Kafka...
+ * Connecting to Kafka...
  * ✓ Loaded CFLT_KAFKA_BROKER from environment
  * ✓ Loaded CFLT_KC_API_KEY from environment
  * ✓ Loaded CFLT_KC_API_SECRET from environment
@@ -84,12 +84,14 @@ public class KafkaOrderProducer {
 
     public static void main(String[] args) throws Exception {
         System.out.println("=== Kafka Order Producer ===");
-        System.out.println("Connecting to Confluent Cloud Kafka...");
+        System.out.println("Connecting to Kafka...");
 
-        // Load Confluent Cloud configuration from environment variables
+        // Load Kafka configuration from environment variables.
+        // For local/Docker Kafka, only CFLT_KAFKA_BROKER is needed (PLAINTEXT, no auth);
+        // for Confluent Cloud, also set CFLT_KC_API_KEY / CFLT_KC_API_SECRET.
         String bootstrapServers = KafkaUtils.getEnvVar(
             "CFLT_KAFKA_BROKER",
-            "localhost:49658"
+            "localhost:9092"
         );
         String apiKey = KafkaUtils.getEnvVar("CFLT_KC_API_KEY", "your-api-key");
         String apiSecret = KafkaUtils.getEnvVar(
