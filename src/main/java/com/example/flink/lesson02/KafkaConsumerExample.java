@@ -1,8 +1,8 @@
 package com.example.flink.lesson02;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.Duration;
-
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.serialization.AbstractDeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -10,12 +10,9 @@ import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import shared.data.generators.Order;
-import utils.KafkaUtils;
 import utils.FlinkEnvironmentConfig;
+import utils.KafkaUtils;
 
 /**
  * Lesson 2: Kafka Integration with Confluent Cloud (Order Processing)
@@ -57,84 +54,99 @@ import utils.FlinkEnvironmentConfig;
  */
 public class KafkaConsumerExample {
 
-  public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
+        // Step 1: Create the execution environment with Web UI enabled
+        StreamExecutionEnvironment env =
+            FlinkEnvironmentConfig.createEnvironmentWithUI();
 
-    // Step 1: Create the execution environment with Web UI enabled
-    StreamExecutionEnvironment env = FlinkEnvironmentConfig.createEnvironmentWithUI();
+        System.out.println("=== Flink Lesson 2: Kafka Integration ===");
+        System.out.println("Connecting to Confluent Cloud Kafka...");
+        System.out.println();
 
-    System.out.println("=== Flink Lesson 2: Kafka Integration ===");
-    System.out.println("Connecting to Confluent Cloud Kafka...");
-    System.out.println();
-    
-    // Print Web UI access instructions
-    FlinkEnvironmentConfig.printWebUIInstructions();
+        // Print Web UI access instructions
+        FlinkEnvironmentConfig.printWebUIInstructions();
 
-    // Step 2: Load Confluent Cloud configuration from environment variables
-    // These should be set in your .env file and loaded into the environment
-    String bootstrapServers = KafkaUtils.getEnvVar("CNFL_KAFKA_BROKER", "your-kafka-broker:9092");
-    String apiKey = KafkaUtils.getEnvVar("CNFL_KC_API_KEY", "your-api-key");
-    String apiSecret = KafkaUtils.getEnvVar("CNFL_KC_API_SECRET", "your-api-secret");
-    String topicName = "orders"; // You can change this to any topic in your cluster
+        // Step 2: Load Confluent Cloud configuration from environment variables
+        // These should be set in your .env file and loaded into the environment
+        String bootstrapServers = KafkaUtils.getEnvVar(
+            "CFLT_KAFKA_BROKER",
+            "your-kafka-broker:9092"
+        );
+        String apiKey = KafkaUtils.getEnvVar("CFLT_KC_API_KEY", "your-api-key");
+        String apiSecret = KafkaUtils.getEnvVar(
+            "CFLT_KC_API_SECRET",
+            "your-api-secret"
+        );
+        String topicName = "orders"; // You can change this to any topic in your cluster
 
-    System.out.println("Bootstrap servers: " + bootstrapServers);
-    System.out.println("Using topic: " + topicName);
+        System.out.println("Bootstrap servers: " + bootstrapServers);
+        System.out.println("Using topic: " + topicName);
 
-    // Step 3: Configure Kafka source with Confluent Cloud settings
-    KafkaSource<Order> kafkaSource = KafkaSource.<Order>builder()
-        .setBootstrapServers(bootstrapServers)
-        .setTopics(topicName)
-        .setGroupId("flink-lesson02-consumer-group")
-        .setStartingOffsets(OffsetsInitializer.latest()) // Start from latest messages
-        .setValueOnlyDeserializer(new OrderJsonDeserializer())
-        .setProperties(KafkaUtils.createConsumerKafkaProperties(apiKey, apiSecret))
-        .build();
+        // Step 3: Configure Kafka source with Confluent Cloud settings
+        KafkaSource<Order> kafkaSource = KafkaSource.<Order>builder()
+            .setBootstrapServers(bootstrapServers)
+            .setTopics(topicName)
+            .setGroupId("flink-lesson02-consumer-group")
+            .setStartingOffsets(OffsetsInitializer.latest()) // Start from latest messages
+            .setValueOnlyDeserializer(new OrderJsonDeserializer())
+            .setProperties(
+                KafkaUtils.createConsumerKafkaProperties(apiKey, apiSecret)
+            )
+            .build();
 
-    // Step 4: Create data st ream from Kafka source
-    // This creates a continuous stream of Order objects from your Kafka topic
-    DataStream<Order> kafkaStream = env
-        .fromSource(
+        // Step 4: Create data st ream from Kafka source
+        // This creates a continuous stream of Order objects from your Kafka topic
+        DataStream<Order> kafkaStream = env.fromSource(
             kafkaSource,
-            WatermarkStrategy.<Order>forBoundedOutOfOrderness(Duration.ofSeconds(5))
-                .withTimestampAssigner((order, timestamp) -> order.timestamp),
+            WatermarkStrategy.<Order>forBoundedOutOfOrderness(
+                Duration.ofSeconds(5)
+            ).withTimestampAssigner((order, timestamp) -> order.timestamp),
             "Kafka Source"
         );
 
-    // Step 5: Process the stream
-    // For this lesson, we'll process each Order object and extract useful information
-    // In real applications, you'd apply transformations, aggregations, etc.
-    kafkaStream
-        .map(order -> {
-          // Add processing timestamp for educational purposes
-          long processingTime = System.currentTimeMillis();
-          String processedOrder = String.format("[%d] Order processed: %s (Customer: %s, Amount: $%.2f, Category: %s)",
-                                                processingTime, order.orderId, order.customerId, order.amount, order.category);
-          System.out.println("Processing order: " + order);
-          return processedOrder;
-        })
-        .print("Processed Orders");
+        // Step 5: Process the stream
+        // For this lesson, we'll process each Order object and extract useful information
+        // In real applications, you'd apply transformations, aggregations, etc.
+        kafkaStream
+            .map(order -> {
+                // Add processing timestamp for educational purposes
+                long processingTime = System.currentTimeMillis();
+                String processedOrder = String.format(
+                    "[%d] Order processed: %s (Customer: %s, Amount: $%.2f, Category: %s)",
+                    processingTime,
+                    order.orderId,
+                    order.customerId,
+                    order.amount,
+                    order.category
+                );
+                System.out.println("Processing order: " + order);
+                return processedOrder;
+            })
+            .print("Processed Orders");
 
-    // Step 6: Execute the program
-    System.out.println("Starting Kafka consumer... Press Ctrl+C to stop.");
-    env.execute("Lesson 2: Kafka Consumer with Confluent Cloud");
-  }
-
-
-  /**
-   * JSON Deserializer for Order objects from Kafka
-   * Handles conversion from JSON strings to Order objects
-   */
-  public static class OrderJsonDeserializer extends AbstractDeserializationSchema<Order> {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Override
-    public Order deserialize(byte[] message) throws IOException {
-      return objectMapper.readValue(message, Order.class);
+        // Step 6: Execute the program
+        System.out.println("Starting Kafka consumer... Press Ctrl+C to stop.");
+        env.execute("Lesson 2: Kafka Consumer with Confluent Cloud");
     }
 
-    @Override
-    public TypeInformation<Order> getProducedType() {
-      return TypeInformation.of(Order.class);
+    /**
+     * JSON Deserializer for Order objects from Kafka
+     * Handles conversion from JSON strings to Order objects
+     */
+    public static class OrderJsonDeserializer
+        extends AbstractDeserializationSchema<Order>
+    {
+
+        private static final ObjectMapper objectMapper = new ObjectMapper();
+
+        @Override
+        public Order deserialize(byte[] message) throws IOException {
+            return objectMapper.readValue(message, Order.class);
+        }
+
+        @Override
+        public TypeInformation<Order> getProducedType() {
+            return TypeInformation.of(Order.class);
+        }
     }
-  }
 }

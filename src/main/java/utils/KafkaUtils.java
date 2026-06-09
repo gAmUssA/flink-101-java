@@ -1,10 +1,9 @@
 package utils;
 
+import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
-
-import java.util.Properties;
 
 /**
  * Kafka Utilities for Educational Flink Lessons
@@ -21,19 +20,19 @@ import java.util.Properties;
  * - Consistent configuration across all lessons
  *
  * Usage Examples:
- * 
+ *
  * For Kafka Consumers (Flink applications):
  * ```java
- * String apiKey = KafkaUtils.getEnvVar("CNFL_KC_API_KEY", "your-api-key");
- * String apiSecret = KafkaUtils.getEnvVar("CNFL_KC_API_SECRET", "your-api-secret");
+ * String apiKey = KafkaUtils.getEnvVar("CFLT_KC_API_KEY", "your-api-key");
+ * String apiSecret = KafkaUtils.getEnvVar("CFLT_KC_API_SECRET", "your-api-secret");
  * Properties props = KafkaUtils.createConsumerKafkaProperties(apiKey, apiSecret);
  * ```
- * 
+ *
  * For Kafka Producers (data generators):
  * ```java
- * String bootstrapServers = KafkaUtils.getEnvVar("CNFL_KAFKA_BROKER", "your-broker:9092");
- * String apiKey = KafkaUtils.getEnvVar("CNFL_KC_API_KEY", "your-api-key");
- * String apiSecret = KafkaUtils.getEnvVar("CNFL_KC_API_SECRET", "your-api-secret");
+ * String bootstrapServers = KafkaUtils.getEnvVar("CFLT_KAFKA_BROKER", "your-broker:9092");
+ * String apiKey = KafkaUtils.getEnvVar("CFLT_KC_API_KEY", "your-api-key");
+ * String apiSecret = KafkaUtils.getEnvVar("CFLT_KC_API_SECRET", "your-api-secret");
  * Properties props = KafkaUtils.createProducerKafkaProperties(bootstrapServers, apiKey, apiSecret);
  * ```
  *
@@ -65,7 +64,12 @@ public class KafkaUtils {
     public static String getEnvVar(String envVarName, String defaultValue) {
         String value = System.getenv(envVarName);
         if (value == null || value.trim().isEmpty()) {
-            System.out.println("⚠️  Environment variable " + envVarName + " not found, using default: " + defaultValue);
+            System.out.println(
+                "⚠️  Environment variable " +
+                    envVarName +
+                    " not found, using default: " +
+                    defaultValue
+            );
             return defaultValue;
         }
         System.out.println("✓ Loaded " + envVarName + " from environment");
@@ -77,7 +81,7 @@ public class KafkaUtils {
      *
      * This method sets up the necessary configuration for Flink Kafka consumers
      * to securely connect to Confluent Cloud using SASL_SSL authentication.
-     * 
+     *
      * Key Configuration Details:
      * - Does NOT set deserializer properties (Flink handles deserialization internally)
      * - Configures SASL_SSL security for Confluent Cloud
@@ -93,30 +97,51 @@ public class KafkaUtils {
      * @param apiSecret Confluent Cloud API secret for authentication
      * @return Properties object configured for Kafka consumer with Confluent Cloud
      */
-    public static Properties createConsumerKafkaProperties(String apiKey, String apiSecret) {
+    public static Properties createConsumerKafkaProperties(
+        String apiKey,
+        String apiSecret
+    ) {
         Properties props = new Properties();
 
         // NOTE: We don't set deserializer properties here because Flink handles
         // deserialization through the deserializer specified in KafkaSource builder
         // Setting deserializers here would conflict with Flink's internal deserialization
 
-        // Confluent Cloud security configuration
-        props.setProperty("security.protocol", "SASL_SSL");
-        props.setProperty("sasl.mechanism", "PLAIN");
-        props.setProperty("sasl.jaas.config", String.format(
-                "org.apache.kafka.common.security.plain.PlainLoginModule required " +
-                "username=\"%s\" password=\"%s\";", apiKey, apiSecret));
+        // Only configure SASL_SSL when real credentials are provided (Confluent Cloud)
+        // For local/Docker Kafka, skip security config entirely (PLAINTEXT is the default)
+        if (isCloudMode(apiKey, apiSecret)) {
+            props.setProperty("security.protocol", "SASL_SSL");
+            props.setProperty("sasl.mechanism", "PLAIN");
+            props.setProperty(
+                "sasl.jaas.config",
+                String.format(
+                    "org.apache.kafka.common.security.plain.PlainLoginModule required " +
+                        "username=\"%s\" password=\"%s\";",
+                    apiKey,
+                    apiSecret
+                )
+            );
+            System.out.println(
+                "✓ Kafka consumer configured for Confluent Cloud (SASL_SSL)"
+            );
+        } else {
+            System.out.println(
+                "✓ Kafka consumer configured for local Kafka (PLAINTEXT)"
+            );
+        }
 
         // Consumer behavior settings for educational clarity
         props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "true");
-        props.setProperty(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "1000");
+        props.setProperty(
+            ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG,
+            "1000"
+        );
 
         // Session and heartbeat settings for stable connections
         props.setProperty(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, "30000");
         props.setProperty(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, "10000");
 
-        System.out.println("✓ Kafka consumer properties configured for Confluent Cloud");
         return props;
     }
 
@@ -125,7 +150,7 @@ public class KafkaUtils {
      *
      * This method sets up the necessary configuration for Kafka producers
      * to securely connect to Confluent Cloud using SASL_SSL authentication.
-     * 
+     *
      * Key Configuration Details:
      * - Sets bootstrap servers, key/value serializers for producers
      * - Configures SASL_SSL security for Confluent Cloud
@@ -143,20 +168,49 @@ public class KafkaUtils {
      * @param apiSecret       Confluent Cloud API secret for authentication
      * @return Properties object configured for Kafka producer with Confluent Cloud
      */
-    public static Properties createProducerKafkaProperties(String bootstrapServers, String apiKey, String apiSecret) {
+    public static Properties createProducerKafkaProperties(
+        String bootstrapServers,
+        String apiKey,
+        String apiSecret
+    ) {
         Properties props = new Properties();
 
         // Basic producer configuration
-        props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        props.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        props.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        props.setProperty(
+            ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+            bootstrapServers
+        );
+        props.setProperty(
+            ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+            StringSerializer.class.getName()
+        );
+        props.setProperty(
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+            StringSerializer.class.getName()
+        );
 
-        // Confluent Cloud security configuration
-        props.setProperty("security.protocol", "SASL_SSL");
-        props.setProperty("sasl.mechanism", "PLAIN");
-        props.setProperty("sasl.jaas.config", String.format(
-                "org.apache.kafka.common.security.plain.PlainLoginModule required " +
-                "username=\"%s\" password=\"%s\";", apiKey, apiSecret));
+        // Only configure SASL_SSL when real credentials are provided (Confluent Cloud)
+        // For local/Docker Kafka, skip security config entirely (PLAINTEXT is the default)
+        if (isCloudMode(apiKey, apiSecret)) {
+            props.setProperty("security.protocol", "SASL_SSL");
+            props.setProperty("sasl.mechanism", "PLAIN");
+            props.setProperty(
+                "sasl.jaas.config",
+                String.format(
+                    "org.apache.kafka.common.security.plain.PlainLoginModule required " +
+                        "username=\"%s\" password=\"%s\";",
+                    apiKey,
+                    apiSecret
+                )
+            );
+            System.out.println(
+                "✓ Kafka producer configured for Confluent Cloud (SASL_SSL)"
+            );
+        } else {
+            System.out.println(
+                "✓ Kafka producer configured for local Kafka (PLAINTEXT)"
+            );
+        }
 
         // Producer behavior settings for educational clarity and reliability
         props.setProperty(ProducerConfig.ACKS_CONFIG, "all"); // Wait for all replicas
@@ -168,7 +222,22 @@ public class KafkaUtils {
         props.setProperty(ProducerConfig.LINGER_MS_CONFIG, "10");
         props.setProperty(ProducerConfig.BUFFER_MEMORY_CONFIG, "33554432");
 
-        System.out.println("✓ Kafka producer properties configured for Confluent Cloud");
         return props;
+    }
+
+    /**
+     * Checks if real Confluent Cloud credentials are provided.
+     * Returns false when API key/secret are missing or still at placeholder defaults,
+     * indicating a local/Docker Kafka setup that needs no authentication.
+     */
+    private static boolean isCloudMode(String apiKey, String apiSecret) {
+        return (
+            apiKey != null &&
+            apiSecret != null &&
+            !apiKey.startsWith("your-") &&
+            !apiSecret.startsWith("your-") &&
+            !apiKey.isBlank() &&
+            !apiSecret.isBlank()
+        );
     }
 }

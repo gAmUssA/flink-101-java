@@ -27,9 +27,9 @@ By the end of this lesson, you will understand:
 ### Environment Variables Required
 Make sure your `.env` file contains:
 ```bash
-export CNFL_KAFKA_BROKER=your-broker-endpoint
-export CNFL_KC_API_KEY=your-kafka-api-key
-export CNFL_KC_API_SECRET=your-kafka-api-secret
+export CFLT_KAFKA_BROKER=your-broker-endpoint
+export CFLT_KC_API_KEY=your-kafka-api-key
+export CFLT_KC_API_SECRET=your-kafka-api-secret
 ```
 
 ## Key Concepts
@@ -97,9 +97,9 @@ When running successfully, you should see:
 ```
 === Flink Lesson 2: Kafka Integration ===
 Connecting to Confluent Cloud Kafka...
-✓ Loaded CNFL_KAFKA_BROKER from environment
-✓ Loaded CNFL_KC_API_KEY from environment
-✓ Loaded CNFL_KC_API_SECRET from environment
+✓ Loaded CFLT_KAFKA_BROKER from environment
+✓ Loaded CFLT_KC_API_KEY from environment
+✓ Loaded CFLT_KC_API_SECRET from environment
 Bootstrap servers: pkc-rgm37.us-west-2.aws.confluent.cloud:9092
 Using topic: orders
 ✓ Kafka properties configured for Confluent Cloud
@@ -133,7 +133,7 @@ Kafka Messages> [1721058123456] {"orderId": "12345", "customerId": "cust_001", "
 - Or modify the topic name in the code to use an existing topic
 
 #### 4. Environment Variables Not Found
-**Error**: `Environment variable CNFL_KC_API_KEY not found`
+**Error**: `Environment variable CFLT_KC_API_KEY not found`
 **Solution**:
 - Run `source .env` before executing the program
 - Verify `.env` file exists and contains required variables
