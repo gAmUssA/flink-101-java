@@ -69,11 +69,11 @@ Run the producer to generate continuous order data:
 **Expected Output:**
 ```
 === Kafka Order Producer ===
-Connecting to Confluent Cloud Kafka...
+Connecting to Kafka...
 ✓ Loaded CFLT_KAFKA_BROKER from environment
 ✓ Loaded CFLT_KC_API_KEY from environment
 ✓ Loaded CFLT_KC_API_SECRET from environment
-✓ Kafka producer configured for Confluent Cloud
+✓ Kafka producer configured for Confluent Cloud (SASL_SSL)
 Starting continuous order generation... Press Ctrl+C to stop.
 Sent Order> Order{id=order_00001, customer=customer_002, amount=156.78, category=Electronics}
   ✓ Delivered to partition 1 at offset 12345

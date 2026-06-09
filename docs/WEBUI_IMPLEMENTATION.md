@@ -160,8 +160,8 @@ Potential improvements for future iterations:
 ## Dependencies
 
 No new dependencies were added. The implementation uses existing Flink libraries:
-- `org.apache.flink:flink-streaming-java:2.0.0`
-- `org.apache.flink:flink-clients:2.0.0`
+- `org.apache.flink:flink-streaming-java:2.2.0`
+- `org.apache.flink:flink-clients:2.2.0`
 
 ## Testing Checklist
 

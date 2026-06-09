@@ -96,13 +96,13 @@ Use Confluent Cloud Console to send test messages to your topic:
 When running successfully, you should see:
 ```
 === Flink Lesson 2: Kafka Integration ===
-Connecting to Confluent Cloud Kafka...
+Connecting to Kafka...
 ✓ Loaded CFLT_KAFKA_BROKER from environment
 ✓ Loaded CFLT_KC_API_KEY from environment
 ✓ Loaded CFLT_KC_API_SECRET from environment
 Bootstrap servers: pkc-rgm37.us-west-2.aws.confluent.cloud:9092
 Using topic: orders
-✓ Kafka properties configured for Confluent Cloud
+✓ Kafka consumer configured for Confluent Cloud (SASL_SSL)
 Starting Kafka consumer... Press Ctrl+C to stop.
 Processing message: {"orderId": "12345", "customerId": "cust_001", "amount": 99.99}
 Kafka Messages> [1721058123456] {"orderId": "12345", "customerId": "cust_001", "amount": 99.99}
