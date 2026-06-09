@@ -2,6 +2,11 @@
 # Educational project - keep it simple and focused
 
 
+# AI assistant artifacts (not committed)
+.junie/
+.kiro/
+.claude/
+
 # IDE configuration files
 .idea/
 .vscode/
