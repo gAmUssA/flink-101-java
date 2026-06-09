@@ -8,7 +8,7 @@ This document summarizes the implementation of Flink Web UI support for all Java
 
 ### 1. New Utility Class: `FlinkEnvironmentConfig`
 
-**Location**: `shared/utils/FlinkEnvironmentConfig.java`
+**Location**: `src/main/java/utils/FlinkEnvironmentConfig.java` (package `utils`)
 
 **Purpose**: Centralized configuration for creating Flink execution environments with Web UI enabled.
 

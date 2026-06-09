@@ -9,15 +9,15 @@ This Flink 101 Java project has been successfully upgraded from Java 17 to Java 
 ### 1. Build Configuration Updates
 
 - **build.gradle.kts**: Updated `sourceCompatibility` and `targetCompatibility` from `VERSION_17` to `VERSION_21`
-- **docker-compose.yml**: Updated Flink images from `flink:2.0.0-scala_2.12-java17` to `flink:2.0.0-scala_2.12-java21`
+- **docker-compose.yml**: Updated Flink images to `flink:2.2.0-scala_2.12-java21` (Java 21 runtime)
 - **GitHub Actions**: Updated CI workflow to use Java 21 exclusively
 
 ### 2. Compatibility Verification
 
 ✅ **Build Status**: All builds successful  
-✅ **Test Status**: All tests passing  
+ℹ️ **Test Status**: No automated test sources yet — Gradle `test` reports `NO-SOURCE`; CI runs a smoke test (build + lesson 1 + shadow jar)  
 ✅ **Runtime Status**: All lessons execute correctly  
-✅ **Flink Compatibility**: Flink 2.0.0 fully supports Java 21  
+✅ **Flink Compatibility**: Flink 2.2.0 fully supports Java 21  
 
 ### 3. Deprecation Warnings
 
@@ -145,8 +145,8 @@ For Kafka producers/consumers or external API calls, virtual threads can improve
 
 1. **No Breaking Changes**: The upgrade from Java 17 to Java 21 is seamless
 2. **Backward Compatibility**: All existing code continues to work
-3. **Gradle Compatibility**: Gradle 8.14.2 fully supports Java 21
-4. **Flink Compatibility**: Flink 2.0.0 officially supports Java 21
+3. **Gradle Compatibility**: Gradle 9.5.0 fully supports Java 21
+4. **Flink Compatibility**: Flink 2.2.0 officially supports Java 21
 5. **Docker Images**: Official Flink Docker images available for Java 21
 
 ## Next Steps
