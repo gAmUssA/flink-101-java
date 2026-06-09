@@ -1,5 +1,10 @@
 -- Dynamic Top-N Leaderboards: Best Performing Customers & Categories
 -- Real-time ranking with windowed top-N analysis
+--
+-- Assumes the `orders` table declares a time attribute column, e.g.:
+--   order_time AS TO_TIMESTAMP_LTZ(`timestamp`, 3),
+--   WATERMARK FOR order_time AS order_time - INTERVAL '5' SECOND
+-- TUMBLE's DESCRIPTOR must reference that column name, not an inline expression.
 CREATE VIEW top_performers_leaderboard AS
 SELECT *
 FROM (
@@ -24,8 +29,8 @@ FROM (
         (SUM(amount) * 0.6 + COUNT(*) * 50 * 0.3 + COUNT(DISTINCT category) * 20 * 0.1) as performance_score
     FROM TABLE(
         TUMBLE(
-            TABLE orders, 
-            DESCRIPTOR(TO_TIMESTAMP_LTZ(`timestamp`, 3)), 
+            TABLE orders,
+            DESCRIPTOR(order_time),
             INTERVAL '1' HOUR
         )
     )
