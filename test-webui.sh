@@ -101,17 +101,20 @@ echo ""
 tail -f /tmp/flink-lesson01.log &
 TAIL_PID=$!
 
-# Cleanup on exit
+# Cleanup on exit (covers Ctrl+C, termination, AND normal exit when the
+# lesson finishes on its own — otherwise the background `tail -f` leaks).
+_cleaned_up=0
 cleanup() {
+    [ "$_cleaned_up" = "1" ] && return
+    _cleaned_up=1
     echo ""
     echo "Cleaning up..."
     kill $LESSON_PID 2>/dev/null
     kill $TAIL_PID 2>/dev/null
     echo "✅ Cleanup complete"
-    exit 0
 }
 
-trap cleanup INT TERM
+trap cleanup INT TERM EXIT
 
 # Wait for user to stop
 wait $LESSON_PID
